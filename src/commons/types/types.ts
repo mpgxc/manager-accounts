@@ -17,6 +17,7 @@ export type AccountProps = {
 export type RoleProps = {
   id: string;
   name: string;
+  description: string;
   createdAt: Date;
   updatedAt: Date;
   permissions: PermissionProps[];
@@ -25,6 +26,7 @@ export type RoleProps = {
 export type PermissionProps = {
   id: string;
   name: string;
+  description: string;
   createdAt: Date;
   updatedAt: Date;
 };

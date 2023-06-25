@@ -4,6 +4,7 @@ import { Permissions } from './permissions';
 
 type RolesProps = {
   name: string;
+  description: string;
   createdAt: Date;
   updatedAt: Date;
   permissions: Permissions[];

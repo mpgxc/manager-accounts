@@ -3,6 +3,7 @@ import { Replace } from 'commons/logic';
 
 type PermissionsProps = {
   name: string;
+  description: string;
   createdAt: Date;
   updatedAt: Date;
 };
