@@ -22,6 +22,12 @@ class Account extends AggregateRoot<AccountProps> {
     this._props.updatedAt = new Date();
   }
 
+  set createdAt(createdAt: Date) {
+    this._props.createdAt = createdAt;
+
+    this.selfUpdate();
+  }
+
   set emailVerified(emailVerified: boolean) {
     this._props.emailVerified = emailVerified;
 
@@ -92,23 +98,21 @@ class Account extends AggregateRoot<AccountProps> {
     props: Replace<
       AccountProps,
       {
+        roles?: Roles[];
+        avatar?: string;
+        updatedAt?: Date;
         createdAt?: Date;
+        lastAccess?: Date;
         emailVerified?: boolean;
       }
     >,
     id?: string,
   ) {
-    const account = new Account(
-      {
-        ...props,
-        createdAt: props.createdAt || new Date(),
-        updatedAt: props.updatedAt || new Date(),
-        emailVerified: props.emailVerified || false,
-      },
-      id,
-    );
+    const account = new Account(props as AccountProps, id);
 
+    account.roles = props.roles || [];
     account.avatar = props.avatar || '';
+    account.createdAt = props.createdAt || new Date();
     account.lastAccess = props.lastAccess || new Date();
     account.emailVerified = props.emailVerified || false;
 
