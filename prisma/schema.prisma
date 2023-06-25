@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator erd {
+  provider                  = "prisma-erd-generator"
+  theme                     = "forest"
+  includeRelationFromFields = true
+}
+
+model Accounts {
+  id            String   @id @default(uuid())
+  name          String
+  username      String   @unique
+  password      String
+  lastName      String
+  phone         String   @unique
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  acceptedTerms Boolean
+  avatar        String?
+  lastAccess    DateTime
+
+  roles AccountsRoles[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([phone])
+  @@index([username])
+  @@map("accounts")
+}
+
+model Roles {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rolesPermissions RolesPermissions[]
+  accountsRoles    AccountsRoles[]
+
+  @@map("roles")
+}
+
+model Permissions {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rolesPermissions RolesPermissions[]
+
+  @@map("permissions")
+}
+
+model RolesPermissions {
+  roleId       String
+  permissionId String
+  createdAt    DateTime @default(now())
+
+  roles       Roles       @relation(fields: [roleId], references: [id])
+  permissions Permissions @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+  @@map("roles_permissions")
+}
+
+model AccountsRoles {
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+
+  users Accounts @relation(fields: [userId], references: [id])
+  roles Roles    @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+  @@map("users_roles")
+}

@@ -1,0 +1,31 @@
+import { Entity } from 'commons/domain';
+import { Replace } from 'commons/logic';
+
+type PermissionsProps = {
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+class Permissions extends Entity<PermissionsProps> {
+  static create(
+    props: Replace<
+      PermissionsProps,
+      {
+        createdAt?: Date;
+      }
+    >,
+    id?: string,
+  ): Permissions {
+    return new Permissions(
+      {
+        ...props,
+        createdAt: props.createdAt || new Date(),
+        updatedAt: props.updatedAt || new Date(),
+      },
+      id,
+    );
+  }
+}
+
+export { Permissions, PermissionsProps };
