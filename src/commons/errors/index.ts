@@ -8,6 +8,7 @@ export enum ApplicationErrorEnum {
   AccountAlreadyExists,
   AccountUnauthorizedAccess,
   EmailAlreadyRegistered,
+  CantAuthenticateAccount,
 }
 
 export type ApplicationErrorType = keyof typeof ApplicationErrorEnum;

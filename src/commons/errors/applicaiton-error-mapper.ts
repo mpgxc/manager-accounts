@@ -22,6 +22,7 @@ class ApplicationErrorMapper {
     AccountUnauthorizedAccess: ForbiddenException,
     EmailAlreadyRegistered: ConflictException,
     AccountCantRegister: UnauthorizedException,
+    CantAuthenticateAccount: UnauthorizedException,
   };
 }
 
