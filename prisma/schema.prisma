@@ -7,12 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-generator erd {
-  provider                  = "prisma-erd-generator"
-  theme                     = "forest"
-  includeRelationFromFields = true
-}
-
 model Accounts {
   id            String   @id @default(uuid())
   name          String
@@ -79,8 +73,8 @@ model AccountsRoles {
   roleId    String
   createdAt DateTime @default(now())
 
-  users Accounts @relation(fields: [userId], references: [id])
-  roles Roles    @relation(fields: [roleId], references: [id])
+  users Accounts? @relation(fields: [userId], references: [id])
+  roles Roles     @relation(fields: [roleId], references: [id])
 
   @@id([userId, roleId])
   @@map("users_roles")
