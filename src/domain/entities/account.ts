@@ -10,6 +10,7 @@ type AccountProps = {
   phone: string;
   email: string;
   emailVerified: boolean;
+  acceptedTerms: boolean;
   avatar: string;
   roles: Roles[];
   lastAccess: Date;
@@ -82,6 +83,12 @@ class Account extends AggregateRoot<AccountProps> {
     this.selfUpdate();
   }
 
+  set acceptedTerms(acceptedTerms: boolean) {
+    this._props.acceptedTerms = acceptedTerms;
+
+    this.selfUpdate();
+  }
+
   set roles(roles: Roles[]) {
     this._props.roles = roles;
 
@@ -104,17 +111,19 @@ class Account extends AggregateRoot<AccountProps> {
         createdAt?: Date;
         lastAccess?: Date;
         emailVerified?: boolean;
+        acceptedTerms?: boolean;
       }
     >,
     id?: string,
   ) {
     const account = new Account(props as AccountProps, id);
 
-    account.roles = props.roles || [];
+    account.roles = props.roles?.length ? props.roles : [];
     account.avatar = props.avatar || '';
     account.createdAt = props.createdAt || new Date();
     account.lastAccess = props.lastAccess || new Date();
     account.emailVerified = props.emailVerified || false;
+    account.acceptedTerms = props.acceptedTerms || false;
 
     return account;
   }

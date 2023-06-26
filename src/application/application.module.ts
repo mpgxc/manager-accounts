@@ -1,13 +1,17 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from 'infra/database/database.module';
+import { ImplRegisterAccountCommand } from './commands/register-account';
 
 export const ApplicationContainerInject = Object.freeze({
-  ImplListEstablishmentCommand: {},
+  RegisterAccountCommand: {
+    useClass: ImplRegisterAccountCommand,
+    provide: ImplRegisterAccountCommand.name,
+  },
 });
 
 @Module({
   imports: [DatabaseModule],
-  providers: [],
-  exports: [],
+  providers: [ApplicationContainerInject.RegisterAccountCommand],
+  exports: [ApplicationContainerInject.RegisterAccountCommand],
 })
 export class ApplicationModule {}

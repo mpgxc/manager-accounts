@@ -9,7 +9,7 @@ type PermissionsProps = {
 };
 
 class Permissions extends Entity<PermissionsProps> {
-  static create(
+  static build(
     props: Replace<
       PermissionsProps,
       {

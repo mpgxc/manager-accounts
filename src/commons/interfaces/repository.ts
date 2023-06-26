@@ -14,7 +14,7 @@ export interface Repository<Input extends Entity | AggregateRoot, Output> {
 
   update(item: Input): Promise<void>;
 
-  findById(id: string): Promise<Maybe<Output>>;
+  findById(id: string): Promise<Maybe<Input>>;
 
   list(queryPaginator?: QueryPaginator): Promise<Paginator<Output>>;
 }

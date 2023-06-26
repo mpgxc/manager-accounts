@@ -1,4 +1,5 @@
 import { Repository } from 'commons/interfaces';
+import { Maybe } from 'commons/logic';
 import { AccountProps } from 'commons/types';
 import { Account } from '../entities/account';
 
@@ -12,7 +13,7 @@ type AccountRepositoryQueryInput = {
 
 interface AccountRepository
   extends Repository<Account, AccountRepositoryOutput> {
-  findBy(props: AccountRepositoryQueryInput): Promise<AccountRepositoryOutput>;
+  findBy(props: AccountRepositoryQueryInput): Promise<Maybe<Account>>;
 }
 
 export {

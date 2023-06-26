@@ -1,14 +1,25 @@
 import { ApplicationError } from 'commons/errors';
 import { Either } from 'commons/logic';
-import { AccountRepositoryOutput } from '../repositories/account-repository';
 
-type RegisterAccountCommandOutput = Either<
-  ApplicationError,
-  AccountRepositoryOutput
->;
+type RegisterAccountCommandInput = {
+  name: string;
+  phone: string;
+  email: string;
+  lastName: string;
+  username: string;
+  password: string;
+};
+
+type RegisterAccountCommandOutput = Either<ApplicationError, unknown>;
 
 interface RegisterAccountCommand {
-  handle(): Promise<RegisterAccountCommandOutput>;
+  handle(
+    props: RegisterAccountCommandInput,
+  ): Promise<RegisterAccountCommandOutput>;
 }
 
-export { RegisterAccountCommand, RegisterAccountCommandOutput };
+export {
+  RegisterAccountCommand,
+  RegisterAccountCommandInput,
+  RegisterAccountCommandOutput,
+};

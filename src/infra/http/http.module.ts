@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
 import { ApplicationModule } from 'application/application.module';
-import { AccountsController } from './controllers/accounts.controller';
+import { AccountsController } from './controllers/account.controller';
 
 @Module({
   imports: [ApplicationModule],
