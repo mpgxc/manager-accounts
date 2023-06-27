@@ -171,8 +171,86 @@ export class ImplAccountRepository implements AccountRepository {
     throw new Error('Method not implemented.');
   }
 
+  //TODO: Refactor this to a mapper
   async findById(id: string): Promise<Maybe<Account>> {
-    throw new Error('Method not implemented.');
+    const account = await this.prisma.accounts.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        roles: {
+          select: {
+            roles: {
+              include: {
+                rolesPermissions: {
+                  select: {
+                    permissions: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        tenant: true,
+      },
+    });
+
+    const roles = account?.roles
+      .map((role) => ({
+        id: role.roles.id,
+        name: role.roles.name,
+        description: role.roles.description,
+        permissions: role.roles.rolesPermissions.map((rolePermission) => ({
+          id: rolePermission.permissions.id,
+          name: rolePermission.permissions.name,
+          description: rolePermission.permissions.description,
+          createdAt: rolePermission.permissions.createdAt,
+          updatedAt: rolePermission.permissions.updatedAt,
+        })),
+      }))
+      .map(({ id, permissions, description, name }) =>
+        Roles.build(
+          {
+            description: description as string,
+            name,
+            permissions: permissions.map(
+              ({ description, id, name, createdAt, updatedAt }) =>
+                Permissions.build(
+                  {
+                    description: description as string,
+                    name,
+                    createdAt,
+                    updatedAt,
+                  },
+                  id,
+                ),
+            ),
+          },
+          id,
+        ),
+      );
+
+    return account
+      ? Account.build(
+          {
+            tenantCode: account.tenant.name,
+            email: account.email,
+            lastName: account.lastName,
+            name: account.name,
+            password: account.password,
+            phone: account.phone,
+            username: account.username,
+            avatar: account.avatar ?? '-',
+            createdAt: account.createdAt,
+            emailVerified: account.emailVerified,
+            lastAccess: account.lastAccess,
+            acceptedTerms: account.acceptedTerms,
+            updatedAt: account.updatedAt,
+            roles,
+          },
+          account.id,
+        )
+      : null;
   }
 
   async list(

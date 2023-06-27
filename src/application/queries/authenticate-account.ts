@@ -1,4 +1,5 @@
 import { Inject } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ImplRegisterAccountCommand } from 'application/commands/register-account';
 import { ApplicationError } from 'commons/errors';
 import { Result } from 'commons/logic';
@@ -15,9 +16,10 @@ import { LoggerService } from 'infra/providers/logger/logger.service';
 class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
   constructor(
     @Inject(ImplAccountRepository.name)
-    private readonly accountRepository: AccountRepository,
+    private readonly repository: AccountRepository,
     private readonly hasher: ImplHasherProvider,
     private readonly logger: LoggerService,
+    private jwtService: JwtService,
   ) {
     this.logger.setContext(ImplRegisterAccountCommand.name);
   }
@@ -25,9 +27,21 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
   async handle({
     email,
     password,
+    tenantCode,
   }: AuthenticateAccountCommandInput): Promise<AuthenticateAccountCommandOutput> {
     try {
-      const account = await this.accountRepository.findBy({
+      const tenantExists = await this.repository.findTenantByName(tenantCode);
+
+      if (!tenantExists) {
+        return Result.failure(
+          ApplicationError.build({
+            message: 'Tenant not found!',
+            name: 'TenantNotFound',
+          }),
+        );
+      }
+
+      const account = await this.repository.findBy({
         email,
       });
 
@@ -60,9 +74,17 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
         permissions: role.props.permissions.map(({ props }) => props.name),
       }));
 
+      const payload = {
+        sub: account.id,
+        email: account.props.email,
+        username: account.props.username,
+        tenantCode: account.props.tenantCode,
+        roles,
+      };
+
       return Result.success({
         refreshToken: 'refreshToken',
-        token: 'token',
+        token: await this.jwtService.signAsync(payload),
         roles,
       });
     } catch (error) {

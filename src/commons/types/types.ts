@@ -8,6 +8,7 @@ export type AccountProps = {
   email: string;
   emailVerified: boolean;
   avatar: string;
+  tenantCode: string;
   roles: RoleProps[];
   lastAccess: Date;
   createdAt: Date;
