@@ -5,6 +5,7 @@ import { ApplicationErrorMapper } from 'commons/errors';
 import { RegisterAccountCommand } from 'domain/commands/register-account';
 import { AuthenticateAccountCommand } from 'domain/queries/authenticate-account';
 import { LoggerService } from 'infra/providers/logger/logger.service';
+import { RequiredHeaders } from '../commons/required-headers.decorator';
 import {
   AccountInput,
   AuthenticateAccountInput,
@@ -25,8 +26,12 @@ export class AccountsController {
   }
 
   @Post()
-  async createAccount(@Body() body: AccountInput) {
+  async createAccount(
+    @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,
+    @Body() body: AccountInput,
+  ) {
     const { name, phone, email, lastName, password, username } = body;
+    const tenantCode = headers['x-tenant-id'];
 
     this.logger.log('Infra > Http > Controller > Create Account', {
       email,
@@ -40,6 +45,7 @@ export class AccountsController {
       lastName,
       password,
       username,
+      tenantCode,
     });
 
     if (response.hasError) {
@@ -59,8 +65,12 @@ export class AccountsController {
   }
 
   @Post('login')
-  async authenticateAccount(@Body() body: AuthenticateAccountInput) {
+  async authenticateAccount(
+    @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,
+    @Body() body: AuthenticateAccountInput,
+  ) {
     const { email, password } = body;
+    const tenantCode = headers['x-tenant-id'];
 
     this.logger.log('Infra > Http > Controller > Authenticate Account', {
       email,
@@ -69,6 +79,7 @@ export class AccountsController {
     const response = await this.authenticateAccountCommand.handle({
       email,
       password,
+      tenantCode,
     });
 
     if (response.hasError) {

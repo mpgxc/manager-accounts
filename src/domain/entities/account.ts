@@ -9,6 +9,7 @@ type AccountProps = {
   lastName: string;
   phone: string;
   email: string;
+  tenantCode: string;
   emailVerified: boolean;
   acceptedTerms: boolean;
   avatar: string;

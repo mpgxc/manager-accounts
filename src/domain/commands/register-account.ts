@@ -8,6 +8,7 @@ type RegisterAccountCommandInput = {
   lastName: string;
   username: string;
   password: string;
+  tenantCode: string;
 };
 
 type RegisterAccountCommandOutput = Either<ApplicationError, unknown>;

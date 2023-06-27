@@ -13,6 +13,7 @@ type AuthenticateAccountCommandInput = {
    */
   email: string;
   password: string;
+  tenantCode: string;
 };
 
 type AuthenticatedAccountOutput = {

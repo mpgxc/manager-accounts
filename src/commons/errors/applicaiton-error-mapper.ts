@@ -23,6 +23,7 @@ class ApplicationErrorMapper {
     EmailAlreadyRegistered: ConflictException,
     AccountCantRegister: UnauthorizedException,
     CantAuthenticateAccount: UnauthorizedException,
+    TenantNotFound: NotFoundException,
   };
 }
 

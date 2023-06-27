@@ -9,6 +9,7 @@ export enum ApplicationErrorEnum {
   AccountUnauthorizedAccess,
   EmailAlreadyRegistered,
   CantAuthenticateAccount,
+  TenantNotFound,
 }
 
 export type ApplicationErrorType = keyof typeof ApplicationErrorEnum;
