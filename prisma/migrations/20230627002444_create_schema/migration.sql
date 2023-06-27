@@ -11,6 +11,7 @@ CREATE TABLE "accounts" (
     "acceptedTerms" BOOLEAN NOT NULL,
     "avatar" TEXT,
     "lastAccess" TIMESTAMP(3) NOT NULL,
+    "tenantCode" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -57,6 +58,16 @@ CREATE TABLE "users_roles" (
     CONSTRAINT "users_roles_pkey" PRIMARY KEY ("userId","roleId")
 );
 
+-- CreateTable
+CREATE TABLE "tenants" (
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "tenants_pkey" PRIMARY KEY ("name")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "accounts_username_key" ON "accounts"("username");
 
@@ -80,6 +91,12 @@ CREATE UNIQUE INDEX "roles_name_key" ON "roles"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "permissions_name_key" ON "permissions"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tenants_name_key" ON "tenants"("name");
+
+-- AddForeignKey
+ALTER TABLE "accounts" ADD CONSTRAINT "accounts_tenantCode_fkey" FOREIGN KEY ("tenantCode") REFERENCES "tenants"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "roles_permissions" ADD CONSTRAINT "roles_permissions_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -22,6 +22,9 @@ model Accounts {
 
   roles AccountsRoles[]
 
+  tenant     Tenants @relation(fields: [tenantCode], references: [name])
+  tenantCode String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -78,4 +81,16 @@ model AccountsRoles {
 
   @@id([userId, roleId])
   @@map("users_roles")
+}
+
+model Tenants {
+  name        String  @id @unique
+  description String?
+
+  accounts Accounts[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tenants")
 }
