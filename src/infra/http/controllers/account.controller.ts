@@ -1,11 +1,11 @@
-import { Body, Controller, Inject, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { ImplRegisterAccountCommand } from 'application/commands/register-account';
 import { ImplAuthenticateAccountCommand } from 'application/queries/authenticate-account';
 import { ApplicationErrorMapper } from 'commons/errors';
 import { RegisterAccountCommand } from 'domain/commands/register-account';
 import { AuthenticateAccountCommand } from 'domain/queries/authenticate-account';
-import { TokenGuard } from 'infra/http/auth/token.guard';
 import { LoggerService } from 'infra/providers/logger/logger.service';
+import { Public } from '../auth/public.route';
 import { RequiredHeaders } from '../commons/required-headers.decorator';
 import {
   AccountInput,
@@ -26,7 +26,6 @@ export class AccountsController {
     this.logger.setContext(AccountsController.name);
   }
 
-  @UseGuards(TokenGuard)
   @Post()
   async createAccount(
     @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,
@@ -66,6 +65,7 @@ export class AccountsController {
     });
   }
 
+  @Public()
   @Post('login')
   async authenticateAccount(
     @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,
