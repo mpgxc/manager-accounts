@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ApplicationError } from 'commons/errors';
 import { Result } from 'commons/logic';
 import {
@@ -10,6 +10,7 @@ import { AccountRepository } from 'domain/repositories/account-repository';
 import { ImplAccountRepository } from 'infra/database/repositories';
 import { LoggerService } from 'infra/providers/logger/logger.service';
 
+@Injectable()
 class ImplGetAccountCommand implements GetAccountCommand {
   constructor(
     @Inject(ImplAccountRepository.name)

@@ -31,3 +31,12 @@ export type PermissionProps = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type TenantProps = {
+  id: string;
+  name: string;
+  description: string;
+  accounts: AccountProps[];
+  createdAt: Date;
+  updatedAt: Date;
+};

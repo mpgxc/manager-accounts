@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ApplicationError } from 'commons/errors';
 import { Result } from 'commons/logic';
 import {
@@ -12,6 +12,7 @@ import { ImplAccountRepository } from 'infra/database/repositories';
 import { ImplHasherProvider } from 'infra/providers/hasher/hasher.provider';
 import { LoggerService } from 'infra/providers/logger/logger.service';
 
+@Injectable()
 class ImplRegisterAccountCommand implements RegisterAccountCommand {
   constructor(
     @Inject(ImplAccountRepository.name)

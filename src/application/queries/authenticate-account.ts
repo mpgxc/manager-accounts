@@ -1,5 +1,5 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ImplRegisterAccountCommand } from 'application/commands/register-account';
 import { Cache } from 'cache-manager';
@@ -16,6 +16,7 @@ import { ImplHasherProvider } from 'infra/providers/hasher/hasher.provider';
 import { LoggerService } from 'infra/providers/logger/logger.service';
 import { SecretsManagerOutput } from 'infra/providers/secrets-manager/secrets-manager.interface';
 
+@Injectable()
 class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
