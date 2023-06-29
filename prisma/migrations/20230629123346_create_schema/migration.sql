@@ -69,15 +69,6 @@ CREATE TABLE "tenants" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "accounts_username_key" ON "accounts"("username");
-
--- CreateIndex
-CREATE UNIQUE INDEX "accounts_phone_key" ON "accounts"("phone");
-
--- CreateIndex
-CREATE UNIQUE INDEX "accounts_email_key" ON "accounts"("email");
-
--- CreateIndex
 CREATE INDEX "accounts_email_idx" ON "accounts"("email");
 
 -- CreateIndex
@@ -85,6 +76,9 @@ CREATE INDEX "accounts_phone_idx" ON "accounts"("phone");
 
 -- CreateIndex
 CREATE INDEX "accounts_username_idx" ON "accounts"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "accounts_tenantCode_username_email_phone_key" ON "accounts"("tenantCode", "username", "email", "phone");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "roles_name_key" ON "roles"("name");
