@@ -47,6 +47,7 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
 
       const account = await this.repository.findBy({
         email,
+        tenantCode,
       });
 
       if (!account) {

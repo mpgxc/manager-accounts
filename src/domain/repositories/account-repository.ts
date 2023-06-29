@@ -10,6 +10,7 @@ type AccountRepositoryQueryInput = {
   email?: string;
   phone?: string;
   username?: string;
+  tenantCode: string;
 };
 
 interface AccountRepository

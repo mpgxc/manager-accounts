@@ -43,10 +43,103 @@ export class ImplAccountRepository implements AccountRepository {
       : null;
   }
 
+  async findUnique({
+    email,
+    phone,
+    username,
+    tenantCode,
+  }: Required<AccountRepositoryQueryInput>): Promise<Maybe<Account>> {
+    const account = await this.prisma.accounts.findUnique({
+      where: {
+        tenantCode_username_email_phone: {
+          username,
+          email,
+          phone,
+          tenantCode,
+        },
+      },
+      include: {
+        roles: {
+          select: {
+            roles: {
+              include: {
+                rolesPermissions: {
+                  select: {
+                    permissions: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        tenant: true,
+      },
+    });
+
+    //TODO: Refactor this to a mapper
+    const roles = account?.roles
+      .map((role) => ({
+        id: role.roles.id,
+        name: role.roles.name,
+        description: role.roles.description,
+        permissions: role.roles.rolesPermissions.map((rolePermission) => ({
+          id: rolePermission.permissions.id,
+          name: rolePermission.permissions.name,
+          description: rolePermission.permissions.description,
+          createdAt: rolePermission.permissions.createdAt,
+          updatedAt: rolePermission.permissions.updatedAt,
+        })),
+      }))
+      .map(({ id, permissions, description, name }) =>
+        Roles.build(
+          {
+            description: description as string,
+            name,
+            permissions: permissions.map(
+              ({ description, id, name, createdAt, updatedAt }) =>
+                Permissions.build(
+                  {
+                    description: description as string,
+                    name,
+                    createdAt,
+                    updatedAt,
+                  },
+                  id,
+                ),
+            ),
+          },
+          id,
+        ),
+      );
+
+    return account
+      ? Account.build(
+          {
+            tenantCode: account.tenant.name,
+            email: account.email,
+            lastName: account.lastName,
+            name: account.name,
+            password: account.password,
+            phone: account.phone,
+            username: account.username,
+            avatar: account.avatar ?? '-',
+            createdAt: account.createdAt,
+            emailVerified: account.emailVerified,
+            lastAccess: account.lastAccess,
+            acceptedTerms: account.acceptedTerms,
+            updatedAt: account.updatedAt,
+            roles,
+          },
+          account.id,
+        )
+      : null;
+  }
+
   async findBy({
     email,
     phone,
     username,
+    tenantCode,
   }: AccountRepositoryQueryInput): Promise<Maybe<Account>> {
     const account = await this.prisma.accounts.findFirst({
       where: {
@@ -61,6 +154,9 @@ export class ImplAccountRepository implements AccountRepository {
             username,
           },
         ],
+        AND: {
+          tenantCode,
+        },
       },
       include: {
         roles: {

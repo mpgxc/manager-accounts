@@ -38,9 +38,10 @@ class ImplGetAccountCommand implements GetAccountCommand {
             email,
             phone,
             username,
+            tenantCode,
           });
 
-      if (!account || account.props.tenantCode !== tenantCode) {
+      if (!account) {
         this.logger.warn(
           'Application > Command > Get Account > Account not found',
         );

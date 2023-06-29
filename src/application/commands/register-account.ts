@@ -49,6 +49,7 @@ class ImplRegisterAccountCommand implements RegisterAccountCommand {
         email,
         phone,
         username,
+        tenantCode,
       });
 
       if (accountExists) {
