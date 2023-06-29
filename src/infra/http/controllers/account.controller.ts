@@ -6,6 +6,7 @@ import { RegisterAccountCommand } from 'domain/commands/register-account';
 import { AuthenticateAccountCommand } from 'domain/queries/authenticate-account';
 import { LoggerService } from 'infra/providers/logger/logger.service';
 import { Public } from '../auth/public.route';
+import { Roles, RolesEnum } from '../auth/roles.decorator';
 import { RequiredHeaders } from '../commons/required-headers.decorator';
 import {
   AccountInput,
@@ -26,6 +27,7 @@ export class AccountsController {
     this.logger.setContext(AccountsController.name);
   }
 
+  @Roles(RolesEnum.Admin)
   @Post()
   async createAccount(
     @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,

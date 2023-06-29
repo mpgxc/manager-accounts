@@ -1,6 +1,8 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ImplRegisterAccountCommand } from 'application/commands/register-account';
+import { Cache } from 'cache-manager';
 import { ApplicationError } from 'commons/errors';
 import { Result } from 'commons/logic';
 import {
@@ -12,9 +14,11 @@ import { AccountRepository } from 'domain/repositories/account-repository';
 import { ImplAccountRepository } from 'infra/database/repositories';
 import { ImplHasherProvider } from 'infra/providers/hasher/hasher.provider';
 import { LoggerService } from 'infra/providers/logger/logger.service';
+import { SecretsManagerOutput } from 'infra/providers/secrets-manager/secrets-manager.interface';
 
 class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
   constructor(
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @Inject(ImplAccountRepository.name)
     private readonly repository: AccountRepository,
     private readonly hasher: ImplHasherProvider,
@@ -82,9 +86,15 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
         roles,
       };
 
+      const secrets = await this.cacheManager.get<SecretsManagerOutput>(
+        tenantCode,
+      );
+
       return Result.success({
         refreshToken: 'refreshToken',
-        token: await this.jwtService.signAsync(payload),
+        token: await this.jwtService.signAsync(payload, {
+          privateKey: secrets?.value.jwt_secret_key,
+        }),
         roles,
       });
     } catch (error) {

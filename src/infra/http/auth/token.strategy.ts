@@ -1,8 +1,11 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ImplGetAccountCommand } from 'application/queries/get-account';
+import { Cache } from 'cache-manager';
 import { GetAccountCommand } from 'domain/queries/get-account';
 import { LoggerService } from 'infra/providers/logger/logger.service';
+import { SecretsManagerOutput } from 'infra/providers/secrets-manager/secrets-manager.interface';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 export type TokenPayload = {
@@ -23,21 +26,37 @@ export type Role = {
 @Injectable()
 export class TokenStrategy extends PassportStrategy(Strategy) {
   constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(ImplGetAccountCommand.name)
     private readonly getAccountCommand: GetAccountCommand,
     private readonly logger: LoggerService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey:
-        '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAttKlBRZpgMaEt443asxE\nLN8EI1NKPdV11KFiDwvA/HIcxreYTzVOI85pnEiVtziOKbZxEXB6Qgo0mG9QeoCu\nzbcBrOsiRXr8FLnj6/nguDljCSsNb0OURR0uMxhqo459rdmSZWcKSZsx2uvMka7L\nDxXnY9i5WprbequRkJK6eGNqtK/6UtNA9mP5awECjdn/fupzhJUUtZKm6ehIA6He\n6J0Qd9RKJt5tF+/JyZg5aEq5Cr2trPE8S7IEli3I0laLFAnSVakb71+/2KdjXP8/\naBcqKoz9StqwGGg3YwtMImTkZOUzX7/zwBPGHT2OQIIDuVAjnGupRhtFcwAxScw6\nyQIDAQAB\n-----END PUBLIC KEY-----',
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKeyProvider: async (request, __, done) => {
+        const tenantCode = request.headers['x-tenant-id'] as string;
+
+        const secrets = await this.cacheManager.get<SecretsManagerOutput>(
+          tenantCode,
+        );
+
+        return done(null, secrets?.value.jwt_public_key);
+      },
     });
+
+    this.logger.setContext(TokenStrategy.name);
   }
 
-  async validate(payload: TokenPayload) {
+  async validate(payload: TokenPayload): Promise<TokenPayload> {
     this.logger.log('Http > Auth > Token Strategy > Validate');
 
+    /**
+     * Maybe we can use a cache here, but for now we will use the database
+     * because it is simpler and also because, by using the update token strategy,
+     * we can avoid too many requests to the database,
+     * keeping the user logged in for a long time
+     */
     const account = await this.getAccountCommand.handle({
       id: payload.sub,
       tenantCode: payload.tenantCode,
@@ -54,7 +73,6 @@ export class TokenStrategy extends PassportStrategy(Strategy) {
     }
 
     this.logger.log('Http > Auth > Token Strategy > Success');
-
     return payload;
   }
 }
