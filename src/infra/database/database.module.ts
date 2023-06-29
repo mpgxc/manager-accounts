@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 
 import { ImplAccountRepository } from './repositories';
+import { ImplTenantRepository } from './repositories/tenant-repository';
 import { PrismaService } from './services/prisma.service';
 
 export const DatabaseContainerInject = Object.freeze({
@@ -8,11 +9,25 @@ export const DatabaseContainerInject = Object.freeze({
     provide: ImplAccountRepository.name,
     useClass: ImplAccountRepository,
   },
+
+  TenantRepository: {
+    provide: ImplTenantRepository.name,
+    useClass: ImplTenantRepository,
+  },
 });
 
+@Global()
 @Module({
   imports: [],
-  providers: [PrismaService, DatabaseContainerInject.AccountRepository],
-  exports: [PrismaService, DatabaseContainerInject.AccountRepository],
+  providers: [
+    PrismaService,
+    DatabaseContainerInject.AccountRepository,
+    DatabaseContainerInject.TenantRepository,
+  ],
+  exports: [
+    PrismaService,
+    DatabaseContainerInject.AccountRepository,
+    DatabaseContainerInject.TenantRepository,
+  ],
 })
 export class DatabaseModule {}

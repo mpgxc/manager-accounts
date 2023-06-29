@@ -6,7 +6,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PassportModule } from '@nestjs/passport';
 import { ApplicationErrorMapper } from 'commons/errors';
 import * as path from 'node:path';
+import { DatabaseModule } from './database/database.module';
+import { configuration } from './environment';
 import { InfraHttpModule } from './http/http.module';
+import { MessagingModule } from './messaging/messaging.module';
 import { ImplHasherProvider } from './providers/hasher/hasher.provider';
 import { LoggerService } from './providers/logger/logger.service';
 import { SecretsManagerPackage } from './providers/secrets-manager/secrets-manager.interface';
@@ -22,10 +25,13 @@ const InfraContainerInject = [
 @Global()
 @Module({
   imports: [
+    DatabaseModule,
     PassportModule,
     InfraHttpModule,
+    MessagingModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      load: [configuration],
     }),
     CacheModule.register({
       isGlobal: true,
@@ -39,11 +45,12 @@ const InfraContainerInject = [
       },
     }),
     ClientsModule.register([
+      //TODO: Adicionar ao environment
       {
         name: SecretsManagerPackage,
         transport: Transport.GRPC,
         options: {
-          url: 'localhost:5000', //TODO: Adicionar ao environment
+          url: 'localhost:5000',
           package: 'secrets',
           protoPath: path.join(__dirname, './grpc/secrets-manager.proto'),
         },

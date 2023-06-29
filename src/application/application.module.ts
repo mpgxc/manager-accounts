@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from 'infra/database/database.module';
 import { ImplRegisterAccountCommand } from './commands/register-account';
 import { ImplRegisterTenantCommand } from './commands/register-tenant';
 import { ImplAuthenticateAccountCommand } from './queries/authenticate-account';
@@ -28,7 +27,6 @@ export const ApplicationContainerInject = Object.freeze({
 });
 
 @Module({
-  imports: [DatabaseModule],
   providers: [
     ApplicationContainerInject.RegisterAccountCommand,
     ApplicationContainerInject.AuthenticateAccountCommand,

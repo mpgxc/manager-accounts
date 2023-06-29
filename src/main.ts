@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-
+import { MicroserviceOptions } from '@nestjs/microservices';
+import { KafkaConsumerService } from 'infra/messaging/kafka-consumer.service';
 import { AppModule } from './app.module';
 
 (async () => {
@@ -16,7 +17,13 @@ import { AppModule } from './app.module';
     }),
   );
 
+  app.connectMicroservice<MicroserviceOptions>({
+    strategy: app.get(KafkaConsumerService),
+  });
+
   app.setGlobalPrefix('api');
+
+  await app.startAllMicroservices();
 
   await app.listen(
     Number(process.env.APP_PORT) || 3001,
