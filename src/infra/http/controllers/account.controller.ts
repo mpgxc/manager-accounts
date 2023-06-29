@@ -116,12 +116,9 @@ export class AccountsController {
 
   @Permissions('accounts:read')
   @Get('me')
-  async me(@CurrentUser() user: any): Promise<User> {
-    console.log({
-      id: user.sub,
-      tenantCode: user.tenantCode,
-    });
-
+  async me(
+    @CurrentUser() user: any /*Seria interessante tipar */,
+  ): Promise<User> {
     const response = await this.getAccountCommand.handle({
       id: user.sub,
       tenantCode: user.tenantCode,
