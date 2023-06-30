@@ -45,13 +45,12 @@ const InfraContainerInject = [
       },
     }),
     ClientsModule.register([
-      //TODO: Adicionar ao environment
       {
         name: SecretsManagerPackage,
         transport: Transport.GRPC,
         options: {
-          url: 'localhost:5000',
-          package: 'secrets',
+          url: `${process.env.GRPC_HOST!}:${process.env.GRPC_PORT!}`,
+          package: process.env.GRPC_PACKAGE!,
           protoPath: path.join(__dirname, './grpc/secrets-manager.proto'),
         },
       },

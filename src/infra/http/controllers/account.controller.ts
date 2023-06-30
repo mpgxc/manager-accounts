@@ -7,7 +7,7 @@ import { RegisterAccountCommand } from 'domain/commands/register-account';
 import { AuthenticateAccountCommand } from 'domain/queries/authenticate-account';
 import { GetAccountCommand } from 'domain/queries/get-account';
 import { LoggerService } from 'infra/providers/logger/logger.service';
-import { User } from '../../../../global/express';
+import { RequesterUser } from '../../../../global/express';
 import { Permissions } from '../auth/permissions.decorator';
 import { Public } from '../auth/public.route';
 import { CurrentUser } from '../commons/current-user.decorator';
@@ -116,26 +116,7 @@ export class AccountsController {
 
   @Permissions('accounts:read')
   @Get('me')
-  async me(
-    @CurrentUser() user: any /*Seria interessante tipar */,
-  ): Promise<User> {
-    const response = await this.getAccountCommand.handle({
-      id: user.sub,
-      tenantCode: user.tenantCode,
-    });
-
-    if (response.hasError) {
-      this.logger.warn(
-        `Infra > Http > Controller > Get Profile > Failure: ${response.value.message}`,
-      );
-
-      throw new this.errorMapper.toException[response.value.name](
-        response.value.message,
-      );
-    }
-
-    this.logger.log('Infra > Http > Controller > Get Profile > Success', {});
-
-    return response.value;
+  async me(@CurrentUser() user: RequesterUser): Promise<RequesterUser> {
+    return user;
   }
 }

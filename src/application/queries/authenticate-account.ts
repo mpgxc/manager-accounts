@@ -20,8 +20,10 @@ import { SecretsManagerOutput } from 'infra/providers/secrets-manager/secrets-ma
 class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+
     @Inject(ImplAccountRepository.name)
     private readonly repository: AccountRepository,
+
     private readonly hasher: ImplHasherProvider,
     private readonly logger: LoggerService,
     private jwtService: JwtService,
@@ -35,17 +37,6 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
     tenantCode,
   }: AuthenticateAccountCommandInput): Promise<AuthenticateAccountCommandOutput> {
     try {
-      const tenantExists = await this.repository.findTenantByName(tenantCode);
-
-      if (!tenantExists) {
-        return Result.failure(
-          ApplicationError.build({
-            message: 'Tenant not found!',
-            name: 'TenantNotFound',
-          }),
-        );
-      }
-
       const account = await this.repository.findBy({
         email,
         tenantCode,
@@ -89,7 +80,7 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
       };
 
       const secrets = await this.cacheManager.get<SecretsManagerOutput>(
-        tenantCode,
+        `${tenantCode}_SECRETS`,
       );
 
       return Result.success({

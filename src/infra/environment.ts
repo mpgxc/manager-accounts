@@ -7,6 +7,12 @@ const appSchema = z.object({
   APP_HOST: z.string().default('localhost'),
 });
 
+const grpcSchema = z.object({
+  GRPC_HOST: z.string().default('localhost'),
+  GRPC_PORT: z.string().default('5000'),
+  GRPC_PACKAGE: z.string().nonempty(),
+});
+
 const kafkaSchema = z.object({
   KAFKA_BROKER: z.string().nonempty(),
   KAFKA_GROUP_ID: z.string().nonempty(),
@@ -19,6 +25,7 @@ const kafkaSchema = z.object({
 
 const combinedSchema = {
   KAFKA: kafkaSchema,
+  GRPC: grpcSchema,
   APP: appSchema,
 };
 

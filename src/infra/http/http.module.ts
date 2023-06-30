@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 
 import { APP_GUARD } from '@nestjs/core';
 import { ApplicationModule } from 'application/application.module';
@@ -30,6 +35,9 @@ import { AccountsController } from './controllers/account.controller';
 })
 export class InfraHttpModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(TenantMiddleware).forRoutes('*');
+    consumer.apply(TenantMiddleware).forRoutes({
+      path: '*',
+      method: RequestMethod.POST,
+    });
   }
 }

@@ -6,9 +6,12 @@ import { Cache } from 'cache-manager';
 import { GetAccountCommand } from 'domain/queries/get-account';
 import { LoggerService } from 'infra/providers/logger/logger.service';
 import { SecretsManagerOutput } from 'infra/providers/secrets-manager/secrets-manager.interface';
+import { ImplSecretsManagerProvider } from 'infra/providers/secrets-manager/secrets-manager.provider';
+import { decode } from 'jsonwebtoken';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { firstValueFrom } from 'rxjs';
 
-export type TokenPayload = {
+export type TokenPayloadInput = {
   sub: string;
   email: string;
   username: string;
@@ -16,6 +19,21 @@ export type TokenPayload = {
   roles: Role[];
   iat: number;
   exp: number;
+};
+
+export type TokenPayloadOutput = {
+  id: string;
+  name: string;
+  username: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  avatar: string;
+  tenantCode: string;
+  roles: Array<{
+    role: string;
+    permissions: Array<string>;
+  }>;
 };
 
 export type Role = {
@@ -26,29 +44,45 @@ export type Role = {
 @Injectable()
 export class TokenStrategy extends PassportStrategy(Strategy) {
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(ImplGetAccountCommand.name)
     private readonly getAccountCommand: GetAccountCommand,
+
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
+
     private readonly logger: LoggerService,
+    private readonly secretsManager: ImplSecretsManagerProvider,
   ) {
     super({
       ignoreExpiration: false,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKeyProvider: async (request, __, done) => {
-        const tenantCode = request.headers['x-tenant-id'] as string;
+      secretOrKeyProvider: async (
+        request: Request,
+        jwtToken: string,
+        done: (unknown: null, secret: string) => void,
+      ) => {
+        const user = decode(jwtToken) as TokenPayloadInput;
 
-        const secrets = await this.cacheManager.get<SecretsManagerOutput>(
-          tenantCode,
+        let secrets = await this.cacheManager.get<SecretsManagerOutput>(
+          `${user.tenantCode}_SECRETS`,
         );
 
-        return done(null, secrets?.value.jwt_public_key);
+        if (!secrets) {
+          secrets = await firstValueFrom(
+            this.secretsManager.get({ key: user.tenantCode }),
+          );
+
+          await this.cacheManager.set(`${user.tenantCode}_SECRETS`, secrets);
+        }
+
+        return done(null, secrets?.value.jwt_public_key as string);
       },
     });
 
     this.logger.setContext(TokenStrategy.name);
   }
 
-  async validate(payload: TokenPayload): Promise<TokenPayload> {
+  async validate(payload: TokenPayloadInput): Promise<TokenPayloadOutput> {
     this.logger.log('Http > Auth > Token Strategy > Validate');
 
     /**
@@ -73,6 +107,7 @@ export class TokenStrategy extends PassportStrategy(Strategy) {
     }
 
     this.logger.log('Http > Auth > Token Strategy > Success');
-    return payload;
+
+    return account.value;
   }
 }

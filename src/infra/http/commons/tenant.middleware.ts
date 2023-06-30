@@ -3,11 +3,16 @@ import {
   Inject,
   Injectable,
   NestMiddleware,
+  NotFoundException,
 } from '@nestjs/common';
 
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { Maybe } from 'commons/logic';
+import { Tenant } from 'domain/entities/tenant';
+import { TenantRepository } from 'domain/repositories/tenant-repository';
 import { NextFunction, Request, Response } from 'express';
+import { ImplTenantRepository } from 'infra/database/repositories';
 import { SecretsManagerOutput } from 'infra/providers/secrets-manager/secrets-manager.interface';
 import { ImplSecretsManagerProvider } from 'infra/providers/secrets-manager/secrets-manager.provider';
 import { firstValueFrom } from 'rxjs';
@@ -22,8 +27,29 @@ export class TenantMiddleware
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly secretsManager: ImplSecretsManagerProvider,
+
+    @Inject(ImplTenantRepository.name)
+    private readonly tenantRepository: TenantRepository,
   ) {
     super();
+  }
+
+  private async tenantExists(tenantCode: string) {
+    let tenant = await this.cacheManager.get<Maybe<Tenant>>(
+      `${tenantCode}_ENTITY`,
+    );
+
+    if (!tenant) {
+      tenant = await this.tenantRepository.findById(tenantCode);
+
+      if (!tenant) {
+        return false;
+      }
+
+      await this.cacheManager.set(`${tenantCode}_ENTITY`, tenant);
+    }
+
+    return true;
   }
 
   async use(req: Request, res: Response, next: NextFunction) {
@@ -41,17 +67,25 @@ export class TenantMiddleware
       throw new BadRequestException(exceptions);
     }
 
-    let secrets = await this.cacheManager.get<SecretsManagerOutput>(tenantCode);
-
-    if (secrets) {
-      return next();
+    if (!(await this.tenantExists(tenantCode))) {
+      throw new NotFoundException('Tenant not found!');
     }
 
-    secrets = await firstValueFrom(
-      this.secretsManager.get({ key: tenantCode }),
-    );
+    {
+      let secrets = await this.cacheManager.get<SecretsManagerOutput>(
+        `${tenantCode}_SECRETS`,
+      );
 
-    await this.cacheManager.set(tenantCode, secrets);
+      if (secrets) {
+        return next();
+      }
+
+      secrets = await firstValueFrom(
+        this.secretsManager.get({ key: tenantCode }),
+      );
+
+      await this.cacheManager.set(`${tenantCode}_SECRETS`, secrets);
+    }
 
     return next();
   }

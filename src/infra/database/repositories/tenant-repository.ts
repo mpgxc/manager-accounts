@@ -10,8 +10,14 @@ import { PrismaService } from '../services/prisma.service';
 export class ImplTenantRepository implements TenantRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async exists(id: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async exists(name: string): Promise<boolean> {
+    const tenant = await this.prisma.tenants.findUnique({
+      where: {
+        name,
+      },
+    });
+
+    return !!tenant;
   }
 
   async create(item: Tenant): Promise<void> {

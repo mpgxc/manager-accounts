@@ -61,9 +61,11 @@ class ImplGetAccountCommand implements GetAccountCommand {
         permissions: role.props.permissions.map(({ props }) => props.name),
       }));
 
+      //TODO: Tem que virar mapper!
       return Result.success({
         ...account.props,
         id: account.id,
+        password: undefined,
         roles,
       });
     } catch (error) {

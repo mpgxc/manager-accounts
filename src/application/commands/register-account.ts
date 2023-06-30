@@ -33,19 +33,6 @@ class ImplRegisterAccountCommand implements RegisterAccountCommand {
     tenantCode,
   }: RegisterAccountCommandInput): Promise<RegisterAccountCommandOutput> {
     try {
-      const tenantExists = await this.accountRepository.findTenantByName(
-        tenantCode,
-      );
-
-      if (!tenantExists) {
-        return Result.failure(
-          ApplicationError.build({
-            message: 'Tenant not found!',
-            name: 'TenantNotFound',
-          }),
-        );
-      }
-
       const accountExists = await this.accountRepository.findBy({
         email,
         phone,
