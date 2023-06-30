@@ -26,7 +26,8 @@ export class TenantMiddleware
   implements NestMiddleware
 {
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
     private readonly secretsManager: ImplSecretsManagerProvider,
 
     @Inject(ImplTenantRepository.name)

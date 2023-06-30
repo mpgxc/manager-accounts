@@ -1,5 +1,8 @@
 import { ImplGetAccountCommand } from '@application/queries/get-account';
-import { GetAccountCommand } from '@domain/queries/get-account';
+import {
+  GetAccountCommand,
+  GetAccountCommandOutputProps,
+} from '@domain/queries/get-account';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import {
   ImplSecretsManagerProvider,
@@ -23,21 +26,6 @@ export type TokenPayloadInput = {
   exp: number;
 };
 
-export type TokenPayloadOutput = {
-  id: string;
-  name: string;
-  username: string;
-  lastName: string;
-  phone: string;
-  email: string;
-  avatar: string;
-  tenantCode: string;
-  roles: Array<{
-    role: string;
-    permissions: Array<string>;
-  }>;
-};
-
 export type Role = {
   role: string;
   permissions: string[];
@@ -50,7 +38,7 @@ export class TokenStrategy extends PassportStrategy(Strategy) {
     private readonly getAccountCommand: GetAccountCommand,
 
     @Inject(CACHE_MANAGER)
-    private cacheManager: Cache,
+    private readonly cacheManager: Cache,
 
     private readonly logger: LoggerService,
     private readonly secretsManager: ImplSecretsManagerProvider,
@@ -84,7 +72,9 @@ export class TokenStrategy extends PassportStrategy(Strategy) {
     this.logger.setContext(TokenStrategy.name);
   }
 
-  async validate(payload: TokenPayloadInput): Promise<TokenPayloadOutput> {
+  async validate(
+    payload: TokenPayloadInput,
+  ): Promise<GetAccountCommandOutputProps> {
     this.logger.log('Http > Auth > Token Strategy > Validate');
 
     /**

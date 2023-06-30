@@ -33,4 +33,9 @@ interface GetAccountCommand {
   handle(props: GetAccountCommandInput): Promise<GetAccountCommandOutput>;
 }
 
-export { GetAccountCommand, GetAccountCommandInput, GetAccountCommandOutput };
+export {
+  GetAccountCommand,
+  GetAccountCommandInput,
+  GetAccountCommandOutput,
+  GetAccountCommandOutputProps,
+};
