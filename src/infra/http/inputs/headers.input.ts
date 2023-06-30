@@ -1,6 +1,6 @@
+import { RegexPatternsEnum } from '@commons/types';
 import { Expose } from 'class-transformer';
 import { IsNotEmpty, IsString, Matches } from 'class-validator';
-import { RegexPatternsEnum } from 'commons/types/enums';
 
 /**
  *  @description Input headers to access routes

@@ -1,5 +1,5 @@
-import { ApplicationError } from 'commons/errors';
-import { Either } from 'commons/logic';
+import { ApplicationError } from '@commons/errors';
+import { Either } from '@commons/logic';
 
 type RegisterTenantCommandInput = {
   name: string;

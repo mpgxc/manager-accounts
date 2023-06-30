@@ -1,16 +1,17 @@
+import { ApplicationModule } from '@application/application.module';
 import {
   MiddlewareConsumer,
   Module,
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-
 import { APP_GUARD } from '@nestjs/core';
-import { ApplicationModule } from 'application/application.module';
-import { PermissionsGuard } from './auth/permissions.guard';
-import { RolesGuard } from './auth/roles.guard';
-import { TokenGuard } from './auth/token.guard';
-import { TokenStrategy } from './auth/token.strategy';
+import {
+  PermissionsGuard,
+  RolesGuard,
+  TokenGuard,
+  TokenStrategy,
+} from './auth';
 import { TenantMiddleware } from './commons/tenant.middleware';
 import { AccountsController } from './controllers/account.controller';
 

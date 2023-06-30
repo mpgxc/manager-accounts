@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { Maybe } from 'commons/logic';
-import { AccountProps } from 'commons/types';
-import { Account } from 'domain/entities/account';
-import { Permissions } from 'domain/entities/permissions';
-import { Roles } from 'domain/entities/roles';
-import { Tenant } from 'domain/entities/tenant';
+import { Maybe } from '@commons/logic';
+import { AccountProps } from '@commons/types';
+import { Account } from '@domain/entities/account';
+import { Permissions } from '@domain/entities/permissions';
+import { Roles } from '@domain/entities/roles';
+import { Tenant } from '@domain/entities/tenant';
 import {
   AccountRepository,
   AccountRepositoryQueryInput,
-} from 'domain/repositories/account-repository';
+} from '@domain/repositories/account-repository';
+import { Injectable } from '@nestjs/common';
 import { Paginator, QueryPaginator } from '../helpers/prisma-paginator';
 import { PrismaService } from '../services/prisma.service';
 

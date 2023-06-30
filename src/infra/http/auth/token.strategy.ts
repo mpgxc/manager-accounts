@@ -1,12 +1,14 @@
+import { ImplGetAccountCommand } from '@application/queries/get-account';
+import { GetAccountCommand } from '@domain/queries/get-account';
+import { LoggerService } from '@infra/providers/logger/logger.service';
+import {
+  ImplSecretsManagerProvider,
+  SecretsManagerOutput,
+} from '@infra/providers/secrets-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ImplGetAccountCommand } from 'application/queries/get-account';
 import { Cache } from 'cache-manager';
-import { GetAccountCommand } from 'domain/queries/get-account';
-import { LoggerService } from 'infra/providers/logger/logger.service';
-import { SecretsManagerOutput } from 'infra/providers/secrets-manager/secrets-manager.interface';
-import { ImplSecretsManagerProvider } from 'infra/providers/secrets-manager/secrets-manager.provider';
 import { decode } from 'jsonwebtoken';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { firstValueFrom } from 'rxjs';

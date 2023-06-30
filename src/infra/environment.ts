@@ -1,5 +1,5 @@
+import { LoggerService } from '@infra/providers/logger/logger.service';
 import 'dotenv/config';
-import { LoggerService } from 'infra/providers/logger/logger.service';
 import { z } from 'zod';
 
 const appSchema = z.object({

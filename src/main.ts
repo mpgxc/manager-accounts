@@ -1,7 +1,7 @@
+import { KafkaConsumerService } from '@infra/messaging/kafka-consumer.service';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions } from '@nestjs/microservices';
-import { KafkaConsumerService } from 'infra/messaging/kafka-consumer.service';
 import { AppModule } from './app.module';
 
 (async () => {
@@ -30,5 +30,5 @@ import { AppModule } from './app.module';
     process.env.APP_HOST || '0.0.0.0',
   );
 
-  console.log(`Server running 🚀: ${await app.getUrl()}`);
+  console.log(`Server running 🚀: ${await app.getUrl()}/api`);
 })();

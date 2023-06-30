@@ -1,14 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ApplicationError } from 'commons/errors';
-import { Result } from 'commons/logic';
+import { ApplicationError } from '@commons/errors';
+import { Result } from '@commons/logic';
 import {
   GetAccountCommand,
   GetAccountCommandInput,
   GetAccountCommandOutput,
-} from 'domain/queries/get-account';
-import { AccountRepository } from 'domain/repositories/account-repository';
-import { ImplAccountRepository } from 'infra/database/repositories';
-import { LoggerService } from 'infra/providers/logger/logger.service';
+} from '@domain/queries/get-account';
+import { AccountRepository } from '@domain/repositories/account-repository';
+import { ImplAccountRepository } from '@infra/database/repositories';
+import { LoggerService } from '@infra/providers/logger/logger.service';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 class ImplGetAccountCommand implements GetAccountCommand {

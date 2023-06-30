@@ -1,5 +1,5 @@
-import { AggregateRoot } from 'commons/domain';
-import { Replace } from 'commons/logic';
+import { AggregateRoot } from '@commons/domain';
+import { Replace } from '@commons/logic';
 import { Roles } from './roles';
 
 type AccountProps = {

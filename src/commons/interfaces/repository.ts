@@ -1,9 +1,9 @@
-import { AggregateRoot, Entity } from 'commons/domain';
-import { Maybe } from 'commons/logic/maybe';
+import { AggregateRoot, Entity } from '@commons/domain';
+import { Maybe } from '@commons/logic';
 import {
   Paginator,
   QueryPaginator,
-} from 'infra/database/helpers/prisma-paginator';
+} from '@infra/database/helpers/prisma-paginator';
 
 export interface Repository<Input extends Entity | AggregateRoot, Output> {
   exists(id: string): Promise<boolean>;

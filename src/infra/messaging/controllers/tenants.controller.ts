@@ -1,8 +1,8 @@
+import { ImplRegisterTenantCommand } from '@application/commands/register-tenant';
+import { RegisterTenantCommand } from '@domain/commands/register-tenant';
+import { LoggerService } from '@infra/providers/logger/logger.service';
 import { Controller, Inject } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
-import { ImplRegisterTenantCommand } from 'application/commands/register-tenant';
-import { RegisterTenantCommand } from 'domain/commands/register-tenant';
-import { LoggerService } from 'infra/providers/logger/logger.service';
 
 type TenantSyncPayload = {
   name: string;
@@ -14,6 +14,7 @@ export class TenantsController {
   constructor(
     @Inject(ImplRegisterTenantCommand.name)
     private readonly registerTenantCommand: RegisterTenantCommand,
+
     private readonly logger: LoggerService,
   ) {}
 

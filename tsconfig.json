@@ -14,12 +14,19 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "outDir": "./dist",
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@application/*": ["./src/application/*"],
+      "@infra/*": ["./src/infra/*"],
+      "@domain/*": ["./src/domain/*"],
+      "@commons/*": ["./src/commons/*"],
+      "@global/*": ["./global/*.ts"]
+    }
   }
 }

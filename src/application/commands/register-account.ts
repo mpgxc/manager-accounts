@@ -1,16 +1,16 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ApplicationError } from 'commons/errors';
-import { Result } from 'commons/logic';
+import { ApplicationError } from '@commons/errors';
+import { Result } from '@commons/logic';
 import {
   RegisterAccountCommand,
   RegisterAccountCommandInput,
   RegisterAccountCommandOutput,
-} from 'domain/commands/register-account';
-import { Account } from 'domain/entities/account';
-import { AccountRepository } from 'domain/repositories/account-repository';
-import { ImplAccountRepository } from 'infra/database/repositories';
-import { ImplHasherProvider } from 'infra/providers/hasher/hasher.provider';
-import { LoggerService } from 'infra/providers/logger/logger.service';
+} from '@domain/commands/register-account';
+import { Account } from '@domain/entities/account';
+import { AccountRepository } from '@domain/repositories/account-repository';
+import { ImplAccountRepository } from '@infra/database/repositories';
+import { ImplHasherProvider } from '@infra/providers/hasher';
+import { LoggerService } from '@infra/providers/logger/logger.service';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 class ImplRegisterAccountCommand implements RegisterAccountCommand {

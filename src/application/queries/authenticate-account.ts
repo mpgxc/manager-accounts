@@ -1,20 +1,20 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ImplRegisterAccountCommand } from 'application/commands/register-account';
-import { Cache } from 'cache-manager';
-import { ApplicationError } from 'commons/errors';
-import { Result } from 'commons/logic';
+import { ImplRegisterAccountCommand } from '@application/commands/register-account';
+import { ApplicationError } from '@commons/errors';
+import { Result } from '@commons/logic';
 import {
   AuthenticateAccountCommand,
   AuthenticateAccountCommandInput,
   AuthenticateAccountCommandOutput,
-} from 'domain/queries/authenticate-account';
-import { AccountRepository } from 'domain/repositories/account-repository';
-import { ImplAccountRepository } from 'infra/database/repositories';
-import { ImplHasherProvider } from 'infra/providers/hasher/hasher.provider';
-import { LoggerService } from 'infra/providers/logger/logger.service';
-import { SecretsManagerOutput } from 'infra/providers/secrets-manager/secrets-manager.interface';
+} from '@domain/queries/authenticate-account';
+import { AccountRepository } from '@domain/repositories/account-repository';
+import { ImplAccountRepository } from '@infra/database/repositories';
+import { ImplHasherProvider } from '@infra/providers/hasher';
+import { LoggerService } from '@infra/providers/logger/logger.service';
+import { SecretsManagerOutput } from '@infra/providers/secrets-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {

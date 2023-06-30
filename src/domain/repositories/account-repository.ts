@@ -1,8 +1,8 @@
-import { Repository } from 'commons/interfaces';
-import { Maybe } from 'commons/logic';
-import { AccountProps } from 'commons/types';
-import { Tenant } from 'domain/entities/tenant';
-import { Account } from '../entities/account';
+import { Repository } from '@commons/interfaces';
+import { Maybe } from '@commons/logic';
+import { AccountProps } from '@commons/types';
+import { Account } from '@domain/entities/account';
+import { Tenant } from '@domain/entities/tenant';
 
 type AccountRepositoryOutput = AccountProps;
 

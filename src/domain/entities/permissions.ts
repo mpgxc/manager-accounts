@@ -1,5 +1,5 @@
-import { Entity } from 'commons/domain';
-import { Replace } from 'commons/logic';
+import { Entity } from '@commons/domain';
+import { Replace } from '@commons/logic';
 
 type PermissionsProps = {
   name: string;

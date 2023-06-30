@@ -1,17 +1,15 @@
+import { ImplRegisterAccountCommand } from '@application/commands/register-account';
+import { ImplAuthenticateAccountCommand } from '@application/queries/authenticate-account';
+import { ImplGetAccountCommand } from '@application/queries/get-account';
+import { ApplicationErrorMapper } from '@commons/errors';
+import { RegisterAccountCommand } from '@domain/commands/register-account';
+import { AuthenticateAccountCommand } from '@domain/queries/authenticate-account';
+import { GetAccountCommand } from '@domain/queries/get-account';
+import { RequesterUser } from '@global/express.d';
+import { LoggerService } from '@infra/providers/logger/logger.service';
 import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
-import { ImplRegisterAccountCommand } from 'application/commands/register-account';
-import { ImplAuthenticateAccountCommand } from 'application/queries/authenticate-account';
-import { ImplGetAccountCommand } from 'application/queries/get-account';
-import { ApplicationErrorMapper } from 'commons/errors';
-import { RegisterAccountCommand } from 'domain/commands/register-account';
-import { AuthenticateAccountCommand } from 'domain/queries/authenticate-account';
-import { GetAccountCommand } from 'domain/queries/get-account';
-import { LoggerService } from 'infra/providers/logger/logger.service';
-import { RequesterUser } from '../../../../global/express';
-import { Permissions } from '../auth/permissions.decorator';
-import { Public } from '../auth/public.route';
-import { CurrentUser } from '../commons/current-user.decorator';
-import { RequiredHeaders } from '../commons/required-headers.decorator';
+import { Permissions, Public } from '../auth';
+import { CurrentUser, RequiredHeaders } from '../commons';
 import {
   AccountInput,
   AuthenticateAccountInput,

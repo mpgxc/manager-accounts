@@ -1,15 +1,15 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ApplicationError } from 'commons/errors';
-import { Result } from 'commons/logic';
+import { ApplicationError } from '@commons/errors';
+import { Result } from '@commons/logic';
 import {
   RegisterTenantCommand,
   RegisterTenantCommandInput,
   RegisterTenantCommandOutput,
-} from 'domain/commands/register-tenant';
-import { Tenant } from 'domain/entities/tenant';
-import { TenantRepository } from 'domain/repositories/tenant-repository';
-import { ImplTenantRepository } from 'infra/database/repositories';
-import { LoggerService } from 'infra/providers/logger/logger.service';
+} from '@domain/commands/register-tenant';
+import { Tenant } from '@domain/entities/tenant';
+import { TenantRepository } from '@domain/repositories/tenant-repository';
+import { ImplTenantRepository } from '@infra/database/repositories';
+import { LoggerService } from '@infra/providers/logger/logger.service';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 class ImplRegisterTenantCommand implements RegisterTenantCommand {

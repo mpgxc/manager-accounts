@@ -1,5 +1,5 @@
+import { Maybe } from '@commons/logic';
 import { Prisma, PrismaClient } from '@prisma/client';
-import { Maybe } from 'commons/logic';
 
 export type Paginator<I> = {
   items: Array<I>;

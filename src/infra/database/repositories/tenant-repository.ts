@@ -1,8 +1,8 @@
+import { Maybe } from '@commons/logic';
+import { TenantProps } from '@commons/types';
+import { Tenant } from '@domain/entities/tenant';
+import { TenantRepository } from '@domain/repositories/tenant-repository';
 import { Injectable } from '@nestjs/common';
-import { Maybe } from 'commons/logic';
-import { TenantProps } from 'commons/types';
-import { Tenant } from 'domain/entities/tenant';
-import { TenantRepository } from 'domain/repositories/tenant-repository';
 import { Paginator, QueryPaginator } from '../helpers/prisma-paginator';
 import { PrismaService } from '../services/prisma.service';
 

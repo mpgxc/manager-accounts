@@ -1,7 +1,7 @@
+import { LoggerService } from '@infra/providers/logger/logger.service';
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ServerKafka } from '@nestjs/microservices';
-import { LoggerService } from 'infra/providers/logger/logger.service';
 
 @Injectable()
 export class KafkaConsumerService

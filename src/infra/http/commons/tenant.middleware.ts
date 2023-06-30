@@ -1,3 +1,12 @@
+import { Maybe } from '@commons/logic';
+import { Tenant } from '@domain/entities/tenant';
+import { TenantRepository } from '@domain/repositories/tenant-repository';
+import { ImplTenantRepository } from '@infra/database/repositories';
+import {
+  ImplSecretsManagerProvider,
+  SecretsManagerOutput,
+} from '@infra/providers/secrets-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BadRequestException,
   Inject,
@@ -5,18 +14,10 @@ import {
   NestMiddleware,
   NotFoundException,
 } from '@nestjs/common';
-
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { Maybe } from 'commons/logic';
-import { Tenant } from 'domain/entities/tenant';
-import { TenantRepository } from 'domain/repositories/tenant-repository';
-import { NextFunction, Request, Response } from 'express';
-import { ImplTenantRepository } from 'infra/database/repositories';
-import { SecretsManagerOutput } from 'infra/providers/secrets-manager/secrets-manager.interface';
-import { ImplSecretsManagerProvider } from 'infra/providers/secrets-manager/secrets-manager.provider';
+import { NextFunction } from 'express';
 import { firstValueFrom } from 'rxjs';
-import { TenantHeader } from '../inputs/headers.input';
+import { TenantHeader } from '../inputs';
 import { InputDtosValidate } from './input-dtos-validate';
 
 @Injectable()
