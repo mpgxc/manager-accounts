@@ -8,6 +8,7 @@ import {
 import { Account } from '@domain/entities/account';
 import { AccountRepository } from '@domain/repositories/account-repository';
 import { ImplAccountRepository } from '@infra/database/repositories';
+import { KafkaProducerService } from '@infra/messaging/kafka-producer.service';
 import { ImplHasherProvider } from '@infra/providers/hasher';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import { Inject, Injectable } from '@nestjs/common';
@@ -17,6 +18,7 @@ class ImplRegisterAccountCommand implements RegisterAccountCommand {
   constructor(
     @Inject(ImplAccountRepository.name)
     private readonly accountRepository: AccountRepository,
+    private readonly kafkaService: KafkaProducerService,
     private readonly hasher: ImplHasherProvider,
     private readonly logger: LoggerService,
   ) {
@@ -60,6 +62,8 @@ class ImplRegisterAccountCommand implements RegisterAccountCommand {
       });
 
       await this.accountRepository.create(account);
+
+      this.kafkaService.emit('tenants.created', account.props);
 
       return Result.success();
     } catch (error) {

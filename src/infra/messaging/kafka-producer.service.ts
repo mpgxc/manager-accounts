@@ -1,12 +1,12 @@
 import { LoggerService } from '@infra/providers/logger/logger.service';
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ServerKafka } from '@nestjs/microservices';
+import { ClientKafka } from '@nestjs/microservices';
 
 @Injectable()
-export class KafkaConsumerService
-  extends ServerKafka
-  implements OnModuleDestroy
+export class KafkaProducerService
+  extends ClientKafka
+  implements OnModuleDestroy, OnModuleInit
 {
   constructor(configService: ConfigService, logger: LoggerService) {
     super({
@@ -20,12 +20,16 @@ export class KafkaConsumerService
         },
         ssl: true,
       },
-      consumer: {
-        groupId: configService.getOrThrow<string>('KAFKA.KAFKA_GROUP_ID'),
+      producer: {
+        allowAutoTopicCreation: true,
       },
     });
 
-    logger.setContext(KafkaConsumerService.name);
+    logger.setContext(KafkaProducerService.name);
+  }
+
+  async onModuleInit() {
+    await this.connect();
   }
 
   async onModuleDestroy() {

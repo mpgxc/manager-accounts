@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
 import { ImplAccountRepository } from './repositories';
 import { ImplTenantRepository } from './repositories/tenant-repository';
@@ -16,7 +16,6 @@ export const DatabaseContainerInject = Object.freeze({
   },
 });
 
-@Global()
 @Module({
   imports: [],
   providers: [

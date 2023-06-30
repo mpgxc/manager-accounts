@@ -1,7 +1,6 @@
-import { KafkaConsumerService } from '@infra/messaging/kafka-consumer.service';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions } from '@nestjs/microservices';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 
 (async () => {
@@ -18,7 +17,19 @@ import { AppModule } from './app.module';
   );
 
   app.connectMicroservice<MicroserviceOptions>({
-    strategy: app.get(KafkaConsumerService),
+    transport: Transport.KAFKA,
+    options: {
+      client: {
+        clientId: process.env.KAFKA_CLIENT_ID!,
+        brokers: [process.env.KAFKA_BROKER!],
+        sasl: {
+          mechanism: 'scram-sha-256',
+          username: process.env.KAFKA_USERNAME!,
+          password: process.env.KAFKA_PASSWORD!,
+        },
+        ssl: true,
+      },
+    },
   });
 
   app.setGlobalPrefix('api');

@@ -27,10 +27,16 @@ const InfraContainerInject = [
 @Global()
 @Module({
   imports: [
-    DatabaseModule,
     PassportModule,
     InfraHttpModule,
-    MessagingModule,
+    {
+      module: MessagingModule,
+      global: true,
+    },
+    {
+      module: DatabaseModule,
+      global: true,
+    },
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
