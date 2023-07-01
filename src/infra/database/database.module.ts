@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { TenantMapper } from './mappers/tenant-mapper';
 import { ImplAccountRepository } from './repositories';
 import { ImplTenantRepository } from './repositories/tenant-repository';
 import { PrismaService } from './services/prisma.service';
@@ -19,6 +20,7 @@ export const DatabaseContainerInject = Object.freeze({
 @Module({
   imports: [],
   providers: [
+    TenantMapper,
     PrismaService,
     DatabaseContainerInject.AccountRepository,
     DatabaseContainerInject.TenantRepository,

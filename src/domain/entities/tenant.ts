@@ -4,7 +4,7 @@ import { Account } from './account';
 
 type TenantProps = {
   name: string;
-  description?: string;
+  description: string;
   accounts: Account[];
   createdAt: Date;
   updatedAt: Date;
@@ -13,6 +13,12 @@ type TenantProps = {
 class Tenant extends Entity<TenantProps> {
   private selfUpdate() {
     this._props.updatedAt = new Date();
+  }
+
+  set description(description: string) {
+    this._props.description = description;
+
+    this.selfUpdate();
   }
 
   static build(
