@@ -20,7 +20,8 @@ model Accounts {
   avatar        String?
   lastAccess    DateTime
 
-  roles AccountsRoles[]
+  roles         AccountsRoles[]
+  refreshTokens RefreshTokens[]
 
   tenant     Tenants @relation(fields: [tenantCode], references: [name])
   tenantCode String
@@ -33,6 +34,19 @@ model Accounts {
   @@index([phone])
   @@index([username])
   @@map("accounts")
+}
+
+model RefreshTokens {
+  id           String   @id @default(uuid())
+  refreshToken String   @unique
+  expiresIn    DateTime
+
+  account   Accounts? @relation(fields: [accountId], references: [id])
+  accountId String?
+
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
 }
 
 model Roles {
