@@ -3,7 +3,6 @@ import { AccountProps } from '@commons/types';
 import { Account } from '@domain/entities/account';
 import { Permissions } from '@domain/entities/permissions';
 import { Roles } from '@domain/entities/roles';
-import { Tenant } from '@domain/entities/tenant';
 import {
   AccountRepository,
   AccountRepositoryQueryInput,
@@ -15,33 +14,6 @@ import { PrismaService } from '../services/prisma.service';
 @Injectable()
 export class ImplAccountRepository implements AccountRepository {
   constructor(private readonly prisma: PrismaService) {}
-
-  //TODO: Adicionar Mapper
-  async findTenantByName(name: string): Promise<Maybe<Tenant>> {
-    const tenant = await this.prisma.tenants.findUnique({
-      where: {
-        name,
-      },
-      include: {
-        accounts: true,
-      },
-    });
-
-    return tenant
-      ? Tenant.build({
-          name: tenant.name,
-          accounts: tenant.accounts.map(({ avatar, ...account }) =>
-            Account.build(
-              {
-                ...account,
-                avatar: avatar as string,
-              },
-              account.id,
-            ),
-          ),
-        })
-      : null;
-  }
 
   async findUnique({
     email,
