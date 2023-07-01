@@ -48,7 +48,6 @@ const InfraContainerInject = [
     JwtModule.register({
       global: true,
       signOptions: {
-        expiresIn: '15m',
         algorithm: 'RS256',
       },
     }),
