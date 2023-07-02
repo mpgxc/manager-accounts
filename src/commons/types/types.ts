@@ -47,4 +47,5 @@ export type RefreshTokens = {
   refreshToken: string;
   expiresIn: Date;
   createdAt: Date;
+  accountId: string;
 };

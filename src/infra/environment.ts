@@ -2,6 +2,11 @@ import { LoggerService } from '@infra/providers/logger/logger.service';
 import 'dotenv/config';
 import { z } from 'zod';
 
+const jwtSchema = z.object({
+  JWT_REFRESH_EXPIRES_IN: z.string().default('30'),
+  JWT_TOKEN_EXPIRES_IN: z.string().default('15'),
+});
+
 const appSchema = z.object({
   APP_PORT: z.string().default('3003'),
   APP_HOST: z.string().default('localhost'),
@@ -27,6 +32,7 @@ const combinedSchema = {
   KAFKA: kafkaSchema,
   GRPC: grpcSchema,
   APP: appSchema,
+  JWT: jwtSchema,
 };
 
 type CombinedSchemaKey = keyof typeof combinedSchema;
