@@ -1,14 +1,23 @@
 import { ImplRegisterAccountCommand } from '@application/commands/register-account';
-import { ImplAuthenticateAccountCommand } from '@application/queries/authenticate-account';
-import { ImplGetAccountCommand } from '@application/queries/get-account';
+import { ImplAuthenticateAccountQuery } from '@application/queries/authenticate-account';
+import { ImplRefreshTokenQuery } from '@application/queries/refresh-token';
 import { ApplicationErrorMapper } from '@commons/errors';
 import { RegisterAccountCommand } from '@domain/commands/register-account';
-import { AuthenticateAccountCommand } from '@domain/queries/authenticate-account';
-import { GetAccountCommand } from '@domain/queries/get-account';
-import { RequesterUser } from '@global/express.d';
+import { AuthenticateAccountQuery } from '@domain/queries/authenticate-account';
+import { RefreshTokenQuery } from '@domain/queries/refresh-token';
+import { UserRequester } from '@global/express.d';
 import { LoggerService } from '@infra/providers/logger/logger.service';
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
-import { Permissions, Public } from '../auth';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { TokenGuard } from '../auth';
+import { RefreshTokenGuard } from '../auth/refresh-token.guard';
 import { CurrentUser, RequiredHeaders } from '../commons';
 import {
   AccountInput,
@@ -21,8 +30,8 @@ export class AccountsController {
     @Inject(ImplRegisterAccountCommand.name)
     private readonly registerAccountCommand: RegisterAccountCommand,
 
-    @Inject(ImplAuthenticateAccountCommand.name)
-    private readonly authenticateAccountCommand: AuthenticateAccountCommand,
+    @Inject(ImplAuthenticateAccountQuery.name)
+    private readonly authenticateAccountQuery: AuthenticateAccountQuery,
 
     @Inject(ImplGetAccountCommand.name)
     private readonly getAccountCommand: GetAccountCommand,
@@ -33,7 +42,6 @@ export class AccountsController {
     this.logger.setContext(AccountsController.name);
   }
 
-  @Public()
   @Post()
   async createAccount(
     @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,
@@ -73,7 +81,6 @@ export class AccountsController {
     });
   }
 
-  @Public()
   @Post('login')
   async authenticateAccount(
     @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,
@@ -86,7 +93,7 @@ export class AccountsController {
       email,
     });
 
-    const response = await this.authenticateAccountCommand.handle({
+    const response = await this.authenticateAccountQuery.handle({
       email,
       password,
       tenantCode,
@@ -112,9 +119,9 @@ export class AccountsController {
     return response.value;
   }
 
-  @Permissions('accounts:read')
+  @UseGuards(TokenGuard)
   @Get('me')
-  async me(@CurrentUser() user: RequesterUser): Promise<RequesterUser> {
+  async me(@CurrentUser() user: UserRequester): Promise<UserRequester> {
     return user;
   }
 }

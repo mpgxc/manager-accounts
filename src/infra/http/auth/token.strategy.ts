@@ -1,7 +1,7 @@
-import { ImplGetAccountCommand } from '@application/queries/get-account';
+import { ImplGetAccountQuery } from '@application/queries/get-account';
 import {
-  GetAccountCommand,
-  GetAccountCommandOutputProps,
+  GetAccountQuery,
+  GetAccountQueryOutputProps,
 } from '@domain/queries/get-account';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import {
@@ -36,8 +36,8 @@ export type Role = {
 @Injectable()
 export class TokenStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
-    @Inject(ImplGetAccountCommand.name)
-    private readonly getAccountCommand: GetAccountCommand,
+    @Inject(ImplGetAccountQuery.name)
+    private readonly getAccountQuery: GetAccountQuery,
 
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
@@ -76,7 +76,7 @@ export class TokenStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   async validate(
     payload: TokenPayloadInput,
-  ): Promise<GetAccountCommandOutputProps> {
+  ): Promise<GetAccountQueryOutputProps> {
     this.logger.log('Http > Auth > Token Strategy > Validate');
 
     /**
@@ -85,7 +85,7 @@ export class TokenStrategy extends PassportStrategy(Strategy, 'jwt') {
      * we can avoid too many requests to the database,
      * keeping the user logged in for a long time
      */
-    const account = await this.getAccountCommand.handle({
+    const account = await this.getAccountQuery.handle({
       id: payload.sub,
       tenantCode: payload.tenantCode,
     });
