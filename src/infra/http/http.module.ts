@@ -6,12 +6,8 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import {
-  PermissionsGuard,
-  RolesGuard,
-  TokenGuard,
-  TokenStrategy,
-} from './auth';
+import { PermissionsGuard, RolesGuard, TokenStrategy } from './auth';
+import { RefreshTokenStrategy } from './auth/refresh-token.strategy';
 import { TenantMiddleware } from './commons/tenant.middleware';
 import { AccountsController } from './controllers/account.controller';
 
@@ -36,9 +32,12 @@ import { AccountsController } from './controllers/account.controller';
 })
 export class InfraHttpModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(TenantMiddleware).forRoutes({
-      path: '*',
-      method: RequestMethod.POST,
-    });
+    consumer
+      .apply(TenantMiddleware)
+      .exclude({
+        method: RequestMethod.ALL,
+        path: 'accounts/me(.*)',
+      })
+      .forRoutes(AccountsController);
   }
 }
