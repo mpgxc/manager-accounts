@@ -1,7 +1,7 @@
 import { ApplicationError } from '@commons/errors';
 import { Either } from '@commons/logic';
 
-type AuthenticateAccountCommandInput = {
+type AuthenticateAccountQueryInput = {
   /**
    * Future supports
    */
@@ -16,24 +16,25 @@ type AuthenticateAccountCommandInput = {
   tenantCode: string;
 };
 
-type AuthenticatedAccountOutput = {
+type AuthenticateAccountQueryOutputProps = {
   token: string;
   refreshToken: string;
 };
 
-type AuthenticateAccountCommandOutput = Either<
+type AuthenticateAccountQueryOutput = Either<
   ApplicationError,
-  AuthenticatedAccountOutput
+  AuthenticateAccountQueryOutputProps
 >;
 
-interface AuthenticateAccountCommand {
+interface AuthenticateAccountQuery {
   handle(
-    props: AuthenticateAccountCommandInput,
-  ): Promise<AuthenticateAccountCommandOutput>;
+    props: AuthenticateAccountQueryInput,
+  ): Promise<AuthenticateAccountQueryOutput>;
 }
 
 export {
-  AuthenticateAccountCommand,
-  AuthenticateAccountCommandInput,
-  AuthenticateAccountCommandOutput,
+  AuthenticateAccountQuery,
+  AuthenticateAccountQueryInput,
+  AuthenticateAccountQueryOutput,
+  AuthenticateAccountQueryOutputProps,
 };
