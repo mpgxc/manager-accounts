@@ -17,13 +17,15 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { firstValueFrom } from 'rxjs';
 
 export type TokenPayloadInput = {
-  sub: string;
   email: string;
   username: string;
   tenantCode: string;
   roles: Role[];
   iat: number;
   exp: number;
+  aud: string;
+  iss: string;
+  sub: string;
 };
 
 export type Role = {
@@ -32,7 +34,7 @@ export type Role = {
 };
 
 @Injectable()
-export class TokenStrategy extends PassportStrategy(Strategy) {
+export class TokenStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     @Inject(ImplGetAccountCommand.name)
     private readonly getAccountCommand: GetAccountCommand,
@@ -65,7 +67,7 @@ export class TokenStrategy extends PassportStrategy(Strategy) {
           await this.cacheManager.set(`${user.tenantCode}_SECRETS`, secrets);
         }
 
-        return done(null, secrets?.value.jwt_public_key as string);
+        return done(null, secrets?.value.jwt_public_key);
       },
     });
 
