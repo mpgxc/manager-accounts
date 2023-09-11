@@ -2,9 +2,9 @@ import { ImplRegisterAccountCommand } from '@application/commands/register-accou
 import { ApplicationError } from '@commons/errors';
 import { Result } from '@commons/logic';
 import {
-  AuthenticateAccountCommand,
-  AuthenticateAccountCommandInput,
-  AuthenticateAccountCommandOutput,
+  AuthenticateAccountQuery,
+  AuthenticateAccountQueryInput,
+  AuthenticateAccountQueryOutput,
 } from '@domain/queries/authenticate-account';
 import { AccountRepository } from '@domain/repositories/account-repository';
 import { Token, TokenRepository } from '@domain/repositories/token-repository';
@@ -26,7 +26,7 @@ type MixinAuthenticateRepository = {
 };
 
 @Injectable()
-class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
+class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
   private repository!: MixinAuthenticateRepository;
 
   constructor(
@@ -56,7 +56,7 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
     email,
     password,
     tenantCode,
-  }: AuthenticateAccountCommandInput): Promise<AuthenticateAccountCommandOutput> {
+  }: AuthenticateAccountQueryInput): Promise<AuthenticateAccountQueryOutput> {
     try {
       const account = await this.repository.accounts.findBy({
         email,
@@ -114,7 +114,7 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
         },
         {
           privateKey: secrets.value.jwt_secret_key,
-          audience: 'Access Token',
+          audience: 'AccessToken',
           issuer: `uzze_accounts_${tenantCode}`,
           expiresIn: `${this.config.get('JWT.JWT_TOKEN_EXPIRES_IN')}d`,
           subject: account.id,
@@ -131,7 +131,7 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
         },
         {
           privateKey: secrets.value.jwt_refresh_secret_key,
-          audience: 'Refresh Token',
+          audience: 'RefreshToken',
           issuer: `uzze_accounts_${tenantCode}`,
           expiresIn: `${refreshExpiresIn}d`,
           subject: account.id,
@@ -183,4 +183,4 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
   }
 }
 
-export { ImplAuthenticateAccountCommand };
+export { ImplAuthenticateAccountQuery };

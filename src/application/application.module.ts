@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ImplRegisterAccountCommand } from './commands/register-account';
 import { ImplRegisterTenantCommand } from './commands/register-tenant';
-import { ImplAuthenticateAccountCommand } from './queries/authenticate-account';
-import { ImplGetAccountCommand } from './queries/get-account';
+import { ImplAuthenticateAccountQuery } from './queries/authenticate-account';
+import { ImplGetAccountQuery } from './queries/get-account';
 
 export const ApplicationContainerInject = Object.freeze({
   RegisterAccountCommand: {
@@ -11,13 +11,13 @@ export const ApplicationContainerInject = Object.freeze({
   },
 
   AuthenticateAccountCommand: {
-    useClass: ImplAuthenticateAccountCommand,
-    provide: ImplAuthenticateAccountCommand.name,
+    useClass: ImplAuthenticateAccountQuery,
+    provide: ImplAuthenticateAccountQuery.name,
   },
 
-  GetAccountCommand: {
-    useClass: ImplGetAccountCommand,
-    provide: ImplGetAccountCommand.name,
+  GetAccountQuery: {
+    useClass: ImplGetAccountQuery,
+    provide: ImplGetAccountQuery.name,
   },
 
   RegisterTenantCommand: {
@@ -28,16 +28,17 @@ export const ApplicationContainerInject = Object.freeze({
 
 @Module({
   providers: [
-    ApplicationContainerInject.RegisterAccountCommand,
     ApplicationContainerInject.AuthenticateAccountCommand,
+    ApplicationContainerInject.RegisterAccountCommand,
     ApplicationContainerInject.RegisterTenantCommand,
-    ApplicationContainerInject.GetAccountCommand,
+    ApplicationContainerInject.GetAccountQuery,
   ],
   exports: [
     ApplicationContainerInject.RegisterAccountCommand,
     ApplicationContainerInject.AuthenticateAccountCommand,
+    ApplicationContainerInject.RegisterAccountCommand,
     ApplicationContainerInject.RegisterTenantCommand,
-    ApplicationContainerInject.GetAccountCommand,
+    ApplicationContainerInject.GetAccountQuery,
   ],
 })
 export class ApplicationModule {}

@@ -1,9 +1,9 @@
 import { ApplicationError } from '@commons/errors';
 import { Result } from '@commons/logic';
 import {
-  GetAccountCommand,
-  GetAccountCommandInput,
-  GetAccountCommandOutput,
+  GetAccountQuery,
+  GetAccountQueryInput,
+  GetAccountQueryOutput,
 } from '@domain/queries/get-account';
 import { AccountRepository } from '@domain/repositories/account-repository';
 import { ImplAccountRepository } from '@infra/database/repositories';
@@ -11,7 +11,7 @@ import { LoggerService } from '@infra/providers/logger/logger.service';
 import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
-class ImplGetAccountCommand implements GetAccountCommand {
+class ImplGetAccountQuery implements GetAccountQuery {
   constructor(
     @Inject(ImplAccountRepository.name)
     private readonly repository: AccountRepository,
@@ -24,7 +24,7 @@ class ImplGetAccountCommand implements GetAccountCommand {
     phone,
     username,
     tenantCode,
-  }: GetAccountCommandInput): Promise<GetAccountCommandOutput> {
+  }: GetAccountQueryInput): Promise<GetAccountQueryOutput> {
     try {
       this.logger.log('Application > Command > Get Account', {
         email,
@@ -70,13 +70,13 @@ class ImplGetAccountCommand implements GetAccountCommand {
       });
     } catch (error) {
       this.logger.error(
-        'Application > Command - Authenticate Account > Unexpected Error',
+        'Application > Command - Get Account > Unexpected Error',
         error,
       );
 
       return Result.failure(
         ApplicationError.build({
-          message: `Unexpected error on authenticate account! ${
+          message: `Unexpected error on get account! ${
             (error as Error).message
           }`,
           name: 'UnexpectedError',
@@ -86,4 +86,4 @@ class ImplGetAccountCommand implements GetAccountCommand {
   }
 }
 
-export { ImplGetAccountCommand };
+export { ImplGetAccountQuery };
