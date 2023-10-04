@@ -1,7 +1,10 @@
+import { UserRequester } from '@global/express';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { UserRequester } from '../../../../global/express';
-import { PERMISSIONS_KEY, PermissionsUnion } from './permissions.decorator';
+import {
+  PERMISSIONS_KEY,
+  PermissionsUnion,
+} from '../decorators/permissions.decorator';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
