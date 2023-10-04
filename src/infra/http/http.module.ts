@@ -6,8 +6,12 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { PermissionsGuard, RolesGuard, TokenStrategy } from './auth';
-import { RefreshTokenStrategy } from './auth/refresh-token.strategy';
+import {
+  PermissionsGuard,
+  RefreshTokenStrategy,
+  RolesGuard,
+  TokenStrategy,
+} from './auth';
 import { TenantMiddleware } from './commons/tenant.middleware';
 import { AccountsController } from './controllers/account.controller';
 
@@ -16,10 +20,7 @@ import { AccountsController } from './controllers/account.controller';
   controllers: [AccountsController],
   providers: [
     TokenStrategy,
-    {
-      provide: APP_GUARD,
-      useClass: TokenGuard,
-    },
+    RefreshTokenStrategy,
     {
       provide: APP_GUARD,
       useClass: RolesGuard,

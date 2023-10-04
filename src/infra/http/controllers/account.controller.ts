@@ -5,7 +5,7 @@ import { ApplicationErrorMapper } from '@commons/errors';
 import { RegisterAccountCommand } from '@domain/commands/register-account';
 import { AuthenticateAccountQuery } from '@domain/queries/authenticate-account';
 import { RefreshTokenQuery } from '@domain/queries/refresh-token';
-import { UserRequester } from '@global/express.d';
+import { UserRequester } from '@global/express';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import {
   Body,
@@ -16,13 +16,9 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { TokenGuard } from '../auth';
-import { RefreshTokenGuard } from '../auth/refresh-token.guard';
+import { RefreshTokenGuard, TokenGuard } from '../auth';
 import { CurrentUser, RequiredHeaders } from '../commons';
-import {
-  AccountInput,
-  AuthenticateAccountInput,
-} from '../inputs/account.input';
+import { AccountInput, AuthenticateAccountInput } from '../inputs';
 
 @Controller('accounts')
 export class AccountsController {
@@ -33,8 +29,8 @@ export class AccountsController {
     @Inject(ImplAuthenticateAccountQuery.name)
     private readonly authenticateAccountQuery: AuthenticateAccountQuery,
 
-    @Inject(ImplGetAccountCommand.name)
-    private readonly getAccountCommand: GetAccountCommand,
+    @Inject(ImplRefreshTokenQuery.name)
+    private readonly refreshTokenQuery: RefreshTokenQuery,
 
     private readonly errorMapper: ApplicationErrorMapper,
     private readonly logger: LoggerService,
