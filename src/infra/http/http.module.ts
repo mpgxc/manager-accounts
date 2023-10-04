@@ -20,18 +20,18 @@ import { AccountsController } from './controllers/account.controller';
   controllers: [AccountsController],
   providers: [
     TokenStrategy,
-    {
-      provide: APP_GUARD,
-      useClass: TokenGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: PermissionsGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: TokenGuard,
+    // },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard,
+    // },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: PermissionsGuard,
+    // },
   ],
 })
 export class InfraHttpModule implements NestModule {

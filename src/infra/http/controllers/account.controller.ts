@@ -1,23 +1,13 @@
 import { ImplRegisterAccountCommand } from '@application/commands/register-account';
 import { ImplAuthenticateAccountQuery } from '@application/queries/authenticate-account';
-import { ImplRefreshTokenQuery } from '@application/queries/refresh-token';
 import { ApplicationErrorMapper } from '@commons/errors';
 import { RegisterAccountCommand } from '@domain/commands/register-account';
 import { AuthenticateAccountQuery } from '@domain/queries/authenticate-account';
-import { RefreshTokenQuery } from '@domain/queries/refresh-token';
+
 import { UserRequester } from '@global/express.d';
 import { LoggerService } from '@infra/providers/logger/logger.service';
-import {
-  Body,
-  Controller,
-  Get,
-  Inject,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, UseGuards } from '@nestjs/common';
 import { TokenGuard } from '../auth';
-import { RefreshTokenGuard } from '../auth/refresh-token.guard';
 import { CurrentUser, RequiredHeaders } from '../commons';
 import {
   AccountInput,
@@ -32,9 +22,6 @@ export class AccountsController {
 
     @Inject(ImplAuthenticateAccountQuery.name)
     private readonly authenticateAccountQuery: AuthenticateAccountQuery,
-
-    @Inject(ImplGetAccountCommand.name)
-    private readonly getAccountCommand: GetAccountCommand,
 
     private readonly errorMapper: ApplicationErrorMapper,
     private readonly logger: LoggerService,

@@ -32,6 +32,15 @@ import { AppModule } from './app.module';
     },
   });
 
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.GRPC,
+    options: {
+      package: process.env.GRPC_PACKAGE!,
+      protoPath: './src/infra/grpc/accounts.proto',
+      url: `${process.env.GRPC_HOST!}:${process.env.GRPC_PORT!}`,
+    },
+  });
+
   app.setGlobalPrefix('api');
 
   await app.startAllMicroservices();
