@@ -3,6 +3,7 @@ import { ImplRegisterAccountCommand } from './commands/register-account';
 import { ImplRegisterTenantCommand } from './commands/register-tenant';
 import { ImplAuthenticateAccountQuery } from './queries/authenticate-account';
 import { ImplGetAccountQuery } from './queries/get-account';
+import { ImplRefreshTokenQuery } from './queries/refresh-token';
 
 export const ApplicationContainerInject = Object.freeze({
   RegisterAccountCommand: {
@@ -24,6 +25,11 @@ export const ApplicationContainerInject = Object.freeze({
     useClass: ImplRegisterTenantCommand,
     provide: ImplRegisterTenantCommand.name,
   },
+
+  RefreshTokenQuery: {
+    useClass: ImplRefreshTokenQuery,
+    provide: ImplRefreshTokenQuery.name,
+  },
 });
 
 @Module({
@@ -31,13 +37,14 @@ export const ApplicationContainerInject = Object.freeze({
     ApplicationContainerInject.AuthenticateAccountCommand,
     ApplicationContainerInject.RegisterAccountCommand,
     ApplicationContainerInject.RegisterTenantCommand,
+    ApplicationContainerInject.RefreshTokenQuery,
     ApplicationContainerInject.GetAccountQuery,
   ],
   exports: [
-    ApplicationContainerInject.RegisterAccountCommand,
     ApplicationContainerInject.AuthenticateAccountCommand,
     ApplicationContainerInject.RegisterAccountCommand,
     ApplicationContainerInject.RegisterTenantCommand,
+    ApplicationContainerInject.RefreshTokenQuery,
     ApplicationContainerInject.GetAccountQuery,
   ],
 })
