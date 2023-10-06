@@ -1,6 +1,10 @@
+import { UserRequester } from '@global/express';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PERMISSIONS_KEY, PermissionsUnion } from './permissions.decorator';
+import {
+  PERMISSIONS_KEY,
+  PermissionsUnion,
+} from '../decorators/permissions.decorator';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -15,7 +19,9 @@ export class PermissionsGuard implements CanActivate {
       return true;
     }
 
-    const { user } = context.switchToHttp().getRequest();
+    const { user } = context.switchToHttp().getRequest<{
+      user: UserRequester;
+    }>();
 
     return requiredPermissions.some((role) =>
       user.roles.find((r) => r.permissions.includes(role.toString())),

@@ -3,16 +3,21 @@ import { ImplAuthenticateAccountQuery } from '@application/queries/authenticate-
 import { ApplicationErrorMapper } from '@commons/errors';
 import { RegisterAccountCommand } from '@domain/commands/register-account';
 import { AuthenticateAccountQuery } from '@domain/queries/authenticate-account';
-
-import { UserRequester } from '@global/express.d';
+import { RefreshTokenQuery } from '@domain/queries/refresh-token';
+import { UserRequester } from '@global/express';
 import { LoggerService } from '@infra/providers/logger/logger.service';
-import { Body, Controller, Get, Inject, Post, UseGuards } from '@nestjs/common';
-import { TokenGuard } from '../auth';
-import { CurrentUser, RequiredHeaders } from '../commons';
 import {
-  AccountInput,
-  AuthenticateAccountInput,
-} from '../inputs/account.input';
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { RefreshTokenGuard, TokenGuard } from '../auth';
+import { CurrentUser, RequiredHeaders } from '../commons';
+import { AccountInput, AuthenticateAccountInput } from '../inputs';
 
 @Controller('accounts')
 export class AccountsController {

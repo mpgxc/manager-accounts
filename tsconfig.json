@@ -26,7 +26,7 @@
       "@infra/*": ["./src/infra/*"],
       "@domain/*": ["./src/domain/*"],
       "@commons/*": ["./src/commons/*"],
-      "@global/*": ["./global/*.ts"]
+      "@global/*": ["./global/*"]
     }
   }
 }

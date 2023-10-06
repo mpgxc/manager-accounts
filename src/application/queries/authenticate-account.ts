@@ -122,7 +122,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
       );
 
       const refreshExpiresIn = Number(
-        this.config.get('JWT_REFRESH_EXPIRES_IN'),
+        this.config.get('JWT.JWT_REFRESH_EXPIRES_IN'),
       );
 
       const refreshToken = await this.jwtService.signAsync(
