@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ImplRegisterAccountCommand } from './commands/register-account';
 import { ImplRegisterTenantCommand } from './commands/register-tenant';
-import { ImplAuthenticateAccountCommand } from './queries/authenticate-account';
-import { ImplGetAccountCommand } from './queries/get-account';
+import { ImplAuthenticateAccountQuery } from './queries/authenticate-account';
+import { ImplGetAccountQuery } from './queries/get-account';
+import { ImplRefreshTokenQuery } from './queries/refresh-token';
 
 export const ApplicationContainerInject = Object.freeze({
   RegisterAccountCommand: {
@@ -11,33 +12,40 @@ export const ApplicationContainerInject = Object.freeze({
   },
 
   AuthenticateAccountCommand: {
-    useClass: ImplAuthenticateAccountCommand,
-    provide: ImplAuthenticateAccountCommand.name,
+    useClass: ImplAuthenticateAccountQuery,
+    provide: ImplAuthenticateAccountQuery.name,
   },
 
-  GetAccountCommand: {
-    useClass: ImplGetAccountCommand,
-    provide: ImplGetAccountCommand.name,
+  GetAccountQuery: {
+    useClass: ImplGetAccountQuery,
+    provide: ImplGetAccountQuery.name,
   },
 
   RegisterTenantCommand: {
     useClass: ImplRegisterTenantCommand,
     provide: ImplRegisterTenantCommand.name,
   },
+
+  RefreshTokenQuery: {
+    useClass: ImplRefreshTokenQuery,
+    provide: ImplRefreshTokenQuery.name,
+  },
 });
 
 @Module({
   providers: [
-    ApplicationContainerInject.RegisterAccountCommand,
     ApplicationContainerInject.AuthenticateAccountCommand,
+    ApplicationContainerInject.RegisterAccountCommand,
     ApplicationContainerInject.RegisterTenantCommand,
-    ApplicationContainerInject.GetAccountCommand,
+    ApplicationContainerInject.RefreshTokenQuery,
+    ApplicationContainerInject.GetAccountQuery,
   ],
   exports: [
-    ApplicationContainerInject.RegisterAccountCommand,
     ApplicationContainerInject.AuthenticateAccountCommand,
+    ApplicationContainerInject.RegisterAccountCommand,
     ApplicationContainerInject.RegisterTenantCommand,
-    ApplicationContainerInject.GetAccountCommand,
+    ApplicationContainerInject.RefreshTokenQuery,
+    ApplicationContainerInject.GetAccountQuery,
   ],
 })
 export class ApplicationModule {}

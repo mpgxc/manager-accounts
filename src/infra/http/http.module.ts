@@ -8,8 +8,8 @@ import {
 import { APP_GUARD } from '@nestjs/core';
 import {
   PermissionsGuard,
+  RefreshTokenStrategy,
   RolesGuard,
-  TokenGuard,
   TokenStrategy,
 } from './auth';
 import { TenantMiddleware } from './commons/tenant.middleware';
@@ -20,10 +20,7 @@ import { AccountsController } from './controllers/account.controller';
   controllers: [AccountsController],
   providers: [
     TokenStrategy,
-    {
-      provide: APP_GUARD,
-      useClass: TokenGuard,
-    },
+    RefreshTokenStrategy,
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
@@ -36,9 +33,12 @@ import { AccountsController } from './controllers/account.controller';
 })
 export class InfraHttpModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(TenantMiddleware).forRoutes({
-      path: '*',
-      method: RequestMethod.POST,
-    });
+    consumer
+      .apply(TenantMiddleware)
+      .exclude({
+        method: RequestMethod.ALL,
+        path: 'accounts/me(.*)',
+      })
+      .forRoutes(AccountsController);
   }
 }

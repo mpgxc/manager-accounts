@@ -2,42 +2,63 @@ import { ImplRegisterAccountCommand } from '@application/commands/register-accou
 import { ApplicationError } from '@commons/errors';
 import { Result } from '@commons/logic';
 import {
-  AuthenticateAccountCommand,
-  AuthenticateAccountCommandInput,
-  AuthenticateAccountCommandOutput,
+  AuthenticateAccountQuery,
+  AuthenticateAccountQueryInput,
+  AuthenticateAccountQueryOutput,
 } from '@domain/queries/authenticate-account';
 import { AccountRepository } from '@domain/repositories/account-repository';
+import { Token, TokenRepository } from '@domain/repositories/token-repository';
 import { ImplAccountRepository } from '@infra/database/repositories';
+import { ImplTokenRepository } from '@infra/database/repositories/token-repository';
 import { ImplHasherProvider } from '@infra/providers/hasher';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import { SecretsManagerOutput } from '@infra/providers/secrets-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Cache } from 'cache-manager';
+import dayjs from 'dayjs';
+
+type MixinAuthenticateRepository = {
+  tokens: TokenRepository;
+  accounts: AccountRepository;
+};
 
 @Injectable()
-class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
+class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
+  private repository!: MixinAuthenticateRepository;
+
   constructor(
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
 
     @Inject(ImplAccountRepository.name)
-    private readonly repository: AccountRepository,
+    private readonly accountRepository: AccountRepository,
+
+    @Inject(ImplTokenRepository.name)
+    private readonly tokenRepository: TokenRepository,
 
     private readonly hasher: ImplHasherProvider,
     private readonly logger: LoggerService,
-    private jwtService: JwtService,
+    private readonly config: ConfigService,
+    private readonly jwtService: JwtService,
   ) {
     this.logger.setContext(ImplRegisterAccountCommand.name);
+
+    this.repository = {
+      tokens: this.tokenRepository,
+      accounts: this.accountRepository,
+    };
   }
 
   async handle({
     email,
     password,
     tenantCode,
-  }: AuthenticateAccountCommandInput): Promise<AuthenticateAccountCommandOutput> {
+  }: AuthenticateAccountQueryInput): Promise<AuthenticateAccountQueryOutput> {
     try {
-      const account = await this.repository.findBy({
+      const account = await this.repository.accounts.findBy({
         email,
         tenantCode,
       });
@@ -45,8 +66,8 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
       if (!account) {
         return Result.failure(
           ApplicationError.build({
-            message: 'Account not found!',
-            name: 'AccountNotFound',
+            message: 'Cant authenticate account! Invalid credentials!',
+            name: 'CantAuthenticateAccount',
           }),
         );
       }
@@ -71,24 +92,78 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
         permissions: role.props.permissions.map(({ props }) => props.name),
       }));
 
-      const payload = {
-        sub: account.id,
-        email: account.props.email,
-        username: account.props.username,
-        tenantCode: account.props.tenantCode,
-        roles,
-      };
-
       const secrets = await this.cacheManager.get<SecretsManagerOutput>(
         `${tenantCode}_SECRETS`,
       );
 
-      return Result.success({
-        refreshToken: 'refreshToken',
-        token: await this.jwtService.signAsync(payload, {
-          privateKey: secrets?.value.jwt_secret_key,
+      if (!secrets) {
+        return Result.failure(
+          ApplicationError.build({
+            message: 'Cant authenticate account! Invalid credentials!',
+            name: 'CantAuthenticateAccount',
+          }),
+        );
+      }
+
+      const token = await this.jwtService.signAsync(
+        {
+          email: account.props.email,
+          username: account.props.username,
+          tenantCode: account.props.tenantCode,
+          roles,
+        },
+        {
+          privateKey: secrets.value.jwt_secret_key,
+          audience: 'AccessToken',
+          issuer: `uzze_accounts_${tenantCode}`,
+          expiresIn: `${this.config.get('JWT.JWT_TOKEN_EXPIRES_IN')}d`,
+          subject: account.id,
+        },
+      );
+
+      const refreshExpiresIn = Number(
+        this.config.get('JWT.JWT_REFRESH_EXPIRES_IN'),
+      );
+
+      const refreshToken = await this.jwtService.signAsync(
+        {
+          tenantCode,
+        },
+        {
+          privateKey: secrets.value.jwt_refresh_secret_key,
+          audience: 'RefreshToken',
+          issuer: `uzze_accounts_${tenantCode}`,
+          expiresIn: `${refreshExpiresIn}d`,
+          subject: account.id,
+          header: {
+            typ: 'RJWT',
+            alg: 'RS256',
+          },
+        },
+      );
+
+      if (await this.repository.tokens.findById(refreshToken)) {
+        return Result.failure(
+          ApplicationError.build({
+            message: 'Cant authenticate account! Many refresh tokens!',
+            name: 'UnexpectedError',
+          }),
+        );
+      }
+
+      const expiresIn = dayjs().add(refreshExpiresIn, 'days').toDate();
+
+      await this.repository.tokens.create(
+        Token.build({
+          accountId: account.id,
+          expiresIn,
+          refreshToken,
         }),
-        roles,
+      );
+
+      return Result.success({
+        token,
+        refreshToken,
       });
     } catch (error) {
       this.logger.error(
@@ -108,4 +183,4 @@ class ImplAuthenticateAccountCommand implements AuthenticateAccountCommand {
   }
 }
 
-export { ImplAuthenticateAccountCommand };
+export { ImplAuthenticateAccountQuery };

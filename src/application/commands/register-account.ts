@@ -17,7 +17,7 @@ import { Inject, Injectable } from '@nestjs/common';
 class ImplRegisterAccountCommand implements RegisterAccountCommand {
   constructor(
     @Inject(ImplAccountRepository.name)
-    private readonly accountRepository: AccountRepository,
+    private readonly repository: AccountRepository,
     private readonly kafkaService: KafkaProducerService,
     private readonly hasher: ImplHasherProvider,
     private readonly logger: LoggerService,
@@ -35,7 +35,7 @@ class ImplRegisterAccountCommand implements RegisterAccountCommand {
     tenantCode,
   }: RegisterAccountCommandInput): Promise<RegisterAccountCommandOutput> {
     try {
-      const accountExists = await this.accountRepository.findBy({
+      const accountExists = await this.repository.findBy({
         email,
         phone,
         username,
@@ -61,7 +61,7 @@ class ImplRegisterAccountCommand implements RegisterAccountCommand {
         tenantCode,
       });
 
-      await this.accountRepository.create(account);
+      await this.repository.create(account);
 
       this.kafkaService.emit('tenants.created', account.props);
 

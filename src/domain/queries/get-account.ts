@@ -1,7 +1,7 @@
 import { ApplicationError } from '@commons/errors';
 import { Either } from '@commons/logic';
 
-type GetAccountCommandInput = {
+type GetAccountQueryInput = {
   id?: string;
   phone?: string;
   username?: string;
@@ -9,7 +9,7 @@ type GetAccountCommandInput = {
   tenantCode: string;
 };
 
-type GetAccountCommandOutputProps = {
+type GetAccountQueryOutputProps = {
   id: string;
   name: string;
   username: string;
@@ -24,18 +24,18 @@ type GetAccountCommandOutputProps = {
   }>;
 };
 
-type GetAccountCommandOutput = Either<
+type GetAccountQueryOutput = Either<
   ApplicationError,
-  GetAccountCommandOutputProps
+  GetAccountQueryOutputProps
 >;
 
-interface GetAccountCommand {
-  handle(props: GetAccountCommandInput): Promise<GetAccountCommandOutput>;
+interface GetAccountQuery {
+  handle(props: GetAccountQueryInput): Promise<GetAccountQueryOutput>;
 }
 
 export {
-  GetAccountCommand,
-  GetAccountCommandInput,
-  GetAccountCommandOutput,
-  GetAccountCommandOutputProps,
+  GetAccountQuery,
+  GetAccountQueryInput,
+  GetAccountQueryOutput,
+  GetAccountQueryOutputProps,
 };

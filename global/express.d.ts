@@ -1,6 +1,6 @@
 import { Request as RequestExpress } from 'express';
 
-type RequesterUser = {
+type UserRequester = {
   id: string;
   name: string;
   username: string;
@@ -17,6 +17,6 @@ type RequesterUser = {
 
 declare module 'express' {
   interface Request extends RequestExpress {
-    user: RequesterUser;
+    user: UserRequester;
   }
 }

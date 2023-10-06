@@ -15,7 +15,10 @@ class ImplSecretsManagerProvider
 {
   private secretsService!: SecretsManagerProvider;
 
-  constructor(@Inject(SecretsManagerPackage) private client: ClientGrpc) {}
+  constructor(
+    @Inject(SecretsManagerPackage)
+    private readonly client: ClientGrpc,
+  ) {}
 
   onModuleInit() {
     this.secretsService = this.client.getService<SecretsManagerProvider>(

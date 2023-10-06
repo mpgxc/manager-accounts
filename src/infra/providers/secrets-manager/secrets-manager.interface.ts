@@ -13,7 +13,13 @@ export type SecretsManagerOutput = {
   /**
    * No futuro, pode ser que tenha mais chaves
    */
-  value: Record<'jwt_public_key' | 'jwt_secret_key', string>;
+  value: Record<
+    | 'jwt_public_key'
+    | 'jwt_secret_key'
+    | 'jwt_refresh_public_key'
+    | 'jwt_refresh_secret_key',
+    string
+  >;
 };
 
 export interface SecretsManagerProvider {

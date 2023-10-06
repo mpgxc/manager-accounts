@@ -1,3 +1,11 @@
+### Proximos passos
+
+- Adicionar provider de email
+- Reset de password
+- Confirmar conta (maybe)
+- Update de Profile + Avatar
+- Provider storage
+
 ### Criar par de chaves privada e pública
 
 ```sh

@@ -7,6 +7,8 @@ export type AccountProps = {
   phone: string;
   email: string;
   emailVerified: boolean;
+  acceptedTerms: boolean;
+  refreshTokens: RefreshTokens[];
   avatar: string;
   tenantCode: string;
   roles: RoleProps[];
@@ -39,4 +41,11 @@ export type TenantProps = {
   accounts: AccountProps[];
   createdAt: Date;
   updatedAt: Date;
+};
+
+export type RefreshTokens = {
+  refreshToken: string;
+  expiresIn: Date;
+  createdAt: Date;
+  accountId: string;
 };
