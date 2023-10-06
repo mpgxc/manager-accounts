@@ -111,6 +111,27 @@ export class AccountsController {
     return response.value;
   }
 
+  @UseGuards(RefreshTokenGuard)
+  @Patch('me/refresh-token')
+  async reAuthenticateAccount(@CurrentUser() user: UserRequester) {
+    console.log({
+      user,
+    });
+
+    const response = await this.refreshTokenQuery.handle({
+      refreshToken: '',
+    });
+
+    if (response.hasError) {
+      throw new this.errorMapper.toException[response.value.name](
+        response.value.message,
+      );
+    }
+
+    return response.value;
+  }
+
+  // @Permissions('accounts:read')
   @UseGuards(TokenGuard)
   @Get('me')
   async me(@CurrentUser() user: UserRequester): Promise<UserRequester> {
