@@ -18,6 +18,7 @@ import {
 import { RefreshTokenGuard, TokenGuard } from '../auth';
 import { CurrentUser, RequiredHeaders } from '../commons';
 import { AccountInput, AuthenticateAccountInput } from '../inputs';
+import { ImplRefreshTokenQuery } from '@application/queries/refresh-token';
 
 @Controller('accounts')
 export class AccountsController {
@@ -27,6 +28,9 @@ export class AccountsController {
 
     @Inject(ImplAuthenticateAccountQuery.name)
     private readonly authenticateAccountQuery: AuthenticateAccountQuery,
+
+    @Inject(ImplRefreshTokenQuery.name)
+    private readonly refreshTokenQuery: RefreshTokenQuery,
 
     private readonly errorMapper: ApplicationErrorMapper,
     private readonly logger: LoggerService,
