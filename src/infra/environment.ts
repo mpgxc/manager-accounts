@@ -15,7 +15,7 @@ const appSchema = z.object({
 const grpcSchema = z.object({
   GRPC_HOST: z.string().default('localhost'),
   GRPC_PORT: z.string().default('5000'),
-  GRPC_PACKAGE: z.string().nonempty(),
+  SM_GRPC_PACKAGE: z.string().nonempty(),
 });
 
 const kafkaSchema = z.object({

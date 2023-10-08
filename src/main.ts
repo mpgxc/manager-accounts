@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { join } from 'node:path';
 import { AppModule } from './app.module';
 
 (async () => {
@@ -35,8 +36,8 @@ import { AppModule } from './app.module';
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: {
-      package: process.env.GRPC_PACKAGE!,
-      protoPath: './src/infra/grpc/accounts.proto',
+      package: 'accounts',
+      protoPath: join(__dirname, './infra/grpc/accounts.proto'),
       url: `${process.env.GRPC_HOST!}:${process.env.GRPC_PORT!}`,
     },
   });

@@ -56,7 +56,7 @@ const InfraContainerInject = [
         name: SecretsManagerPackage,
         transport: Transport.GRPC,
         options: {
-          url: `${process.env.SM_GRPC_HOST!}:${process.env.SM_GRPC_PORT!}`,
+          url: `${process.env.GRPC_HOST!}:${process.env.GRPC_PORT!}`,
           package: process.env.SM_GRPC_PACKAGE!,
           protoPath: path.join(__dirname, './grpc/secrets-manager.proto'),
         },
