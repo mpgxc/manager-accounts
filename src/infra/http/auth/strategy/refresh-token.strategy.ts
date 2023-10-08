@@ -33,33 +33,40 @@ export class RefreshTokenStrategy extends PassportStrategy(
     super({
       ignoreExpiration: false,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKeyProvider: async (
-        request: Request,
-        jwtToken: string,
-        done: (unknown?: any, secret?: string) => void,
-      ) => {
-        const user = decode(jwtToken) as TokenPayloadInput;
-
-        if (!user) return done();
-
-        let secrets = await this.cacheManager.get<SecretsManagerOutput>(
-          `${user.tenantCode}_SECRETS`,
-        );
-
-        if (!secrets) {
-          secrets = await firstValueFrom(
-            this.secretsManager.get({ key: user.tenantCode }),
-          );
-
-          await this.cacheManager.set(`${user.tenantCode}_SECRETS`, secrets);
-        }
-
-        return done(null, secrets.value.jwt_refresh_public_key);
-      },
+      secretOrKeyProvider: RefreshTokenStrategy.getSecretKey(
+        cacheManager,
+        secretsManager,
+      ),
     });
 
     this.logger.setContext(RefreshTokenStrategy.name);
   }
+
+  private static getSecretKey =
+    (cacheManager: Cache, secretsManager: ImplSecretsManagerProvider) =>
+    async (
+      request: Request,
+      jwtToken: string,
+      done: (unknown?: any, secret?: string) => void,
+    ) => {
+      const user = decode(jwtToken) as TokenPayloadInput;
+
+      if (!user) return done();
+
+      let secrets = await cacheManager.get<SecretsManagerOutput>(
+        `${user.tenantCode}_SECRETS`,
+      );
+
+      if (!secrets) {
+        secrets = await firstValueFrom(
+          secretsManager.get({ key: user.tenantCode }),
+        );
+
+        await cacheManager.set(`${user.tenantCode}_SECRETS`, secrets);
+      }
+
+      return done(null, secrets.value.jwt_refresh_public_key);
+    };
 
   async validate(
     request: Request,
@@ -84,6 +91,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
 
     this.logger.log('Http > Auth > Refresh Token Strategy > Success');
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [, refreshToken] = request.headers['Authorization'].split(' ');
 
     return {
