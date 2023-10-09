@@ -1,5 +1,6 @@
 import { ImplRegisterAccountCommand } from '@application/commands/register-account';
 import { ImplAuthenticateAccountQuery } from '@application/queries/authenticate-account';
+import { ImplRefreshTokenQuery } from '@application/queries/refresh-token';
 import { ApplicationErrorMapper } from '@commons/errors';
 import { RegisterAccountCommand } from '@domain/commands/register-account';
 import { AuthenticateAccountQuery } from '@domain/queries/authenticate-account';
@@ -18,7 +19,6 @@ import {
 import { RefreshTokenGuard, TokenGuard } from '../auth';
 import { CurrentUser, RequiredHeaders } from '../commons';
 import { AccountInput, AuthenticateAccountInput } from '../inputs';
-import { ImplRefreshTokenQuery } from '@application/queries/refresh-token';
 
 @Controller('accounts')
 export class AccountsController {
@@ -117,13 +117,11 @@ export class AccountsController {
 
   @UseGuards(RefreshTokenGuard)
   @Patch('me/refresh-token')
-  async reAuthenticateAccount(@CurrentUser() user: UserRequester) {
-    console.log({
-      user,
-    });
-
+  async reAuthenticateAccount(
+    @RequiredHeaders(['Authorization']) headers: Record<string, string>,
+  ) {
     const response = await this.refreshTokenQuery.handle({
-      refreshToken: '',
+      refreshToken: headers['Authorization'],
     });
 
     if (response.hasError) {

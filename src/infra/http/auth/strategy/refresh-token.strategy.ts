@@ -32,6 +32,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
   ) {
     super({
       ignoreExpiration: false,
+      passReqToCallback: true,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKeyProvider: RefreshTokenStrategy.getSecretKey(
         cacheManager,
@@ -91,19 +92,6 @@ export class RefreshTokenStrategy extends PassportStrategy(
 
     this.logger.log('Http > Auth > Refresh Token Strategy > Success');
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [, refreshToken] = request.headers['Authorization'].split(' ');
-
-    return {
-      avatar: account.value.avatar,
-      email: account.value.email,
-      id: account.value.id,
-      lastName: account.value.lastName,
-      name: account.value.name,
-      phone: account.value.phone,
-      roles: account.value.roles,
-      tenantCode: account.value.tenantCode,
-      username: account.value.username,
-    };
+    return account.value;
   }
 }
