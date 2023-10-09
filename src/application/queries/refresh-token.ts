@@ -16,10 +16,6 @@ class ImplRefreshTokenQuery implements RefreshTokenQuery {
     refreshToken,
   }: RefreshTokenQueryInput): Promise<RefreshTokenQueryOutput> {
     try {
-      this.logger.log('Application > Command > Refresh Token', {
-        refreshToken,
-      });
-
       return Result.success({
         token: 'token',
         refreshToken: 'refreshToken',
