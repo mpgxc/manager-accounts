@@ -116,14 +116,20 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
           privateKey: secrets.value.jwt_secret_key,
           audience: 'AccessToken',
           issuer: `uzze_accounts_${tenantCode}`,
-          expiresIn: `${this.config.get('JWT.JWT_TOKEN_EXPIRES_IN')}d`,
+          expiresIn: `${this.config.get('JWT.JWT_TOKEN_EXPIRES_IN')}m`,
           subject: account.id,
+          header: {
+            typ: 'JWT',
+            alg: 'RS256',
+          },
         },
       );
 
       const refreshExpiresIn = Number(
         this.config.get('JWT.JWT_REFRESH_EXPIRES_IN'),
       );
+
+      const refreshTokenExpiresIn = dayjs().add(refreshExpiresIn, 'minutes');
 
       const refreshToken = await this.jwtService.signAsync(
         {
@@ -133,7 +139,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
           privateKey: secrets.value.jwt_refresh_secret_key,
           audience: 'RefreshToken',
           issuer: `uzze_accounts_${tenantCode}`,
-          expiresIn: `${refreshExpiresIn}d`,
+          expiresIn: `${refreshTokenExpiresIn.minute()}m`,
           subject: account.id,
           header: {
             typ: 'RJWT',
@@ -151,12 +157,10 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
         );
       }
 
-      const expiresIn = dayjs().add(refreshExpiresIn, 'days').toDate();
-
       await this.repository.tokens.create(
         Token.build({
           accountId: account.id,
-          expiresIn,
+          expiresIn: refreshTokenExpiresIn.toDate(),
           refreshToken,
         }),
       );
