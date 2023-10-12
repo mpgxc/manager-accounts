@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { join } from 'node:path';
 import { AppModule } from './app.module';
 
@@ -45,6 +46,18 @@ import { AppModule } from './app.module';
   app.setGlobalPrefix('api');
 
   await app.startAllMicroservices();
+
+  const document = SwaggerModule.createDocument(
+    app,
+    new DocumentBuilder()
+      .setTitle('Uzze Accounts')
+      .setDescription('The Uzze Accounts API description')
+      .setVersion('1.0')
+      .addTag('accounts')
+      .build(),
+  );
+
+  SwaggerModule.setup('docs', app, document);
 
   await app.listen(
     Number(process.env.APP_PORT) || 3001,
