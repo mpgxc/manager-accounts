@@ -61,9 +61,8 @@ export class TenantMiddleware
       ['x-tenant-id']: tenantCode,
     });
 
-    const { exceptions, hasError } = await this.validate<TenantHeader>(
-      instance,
-    );
+    const { exceptions, hasError } =
+      await this.validate<TenantHeader>(instance);
 
     if (hasError) {
       throw new BadRequestException(exceptions);

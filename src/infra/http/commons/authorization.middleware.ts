@@ -20,9 +20,8 @@ export class AuthorizationMiddleware
       authorization,
     });
 
-    const { exceptions, hasError } = await this.validate<AuthorizationHeader>(
-      instance,
-    );
+    const { exceptions, hasError } =
+      await this.validate<AuthorizationHeader>(instance);
 
     if (hasError) {
       throw new BadRequestException(exceptions);
