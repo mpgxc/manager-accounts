@@ -8,7 +8,7 @@ export class ImplTokenRepository implements TokenRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async exists(refreshToken: string): Promise<boolean> {
-    const token = await this.prisma.refreshTokens.findUnique({
+    const token = await this.prisma.refreshToken.findUnique({
       where: {
         refreshToken,
       },
@@ -18,7 +18,7 @@ export class ImplTokenRepository implements TokenRepository {
   }
 
   async create(item: Token): Promise<void> {
-    await this.prisma.refreshTokens.create({
+    await this.prisma.refreshToken.create({
       data: {
         expiresIn: item.props.expiresIn,
         refreshToken: item.props.refreshToken,
@@ -32,7 +32,7 @@ export class ImplTokenRepository implements TokenRepository {
   }
 
   async findById(refreshToken: string): Promise<Maybe<Token>> {
-    const token = await this.prisma.refreshTokens.findUnique({
+    const token = await this.prisma.refreshToken.findUnique({
       where: {
         refreshToken,
       },
