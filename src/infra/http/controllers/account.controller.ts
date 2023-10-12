@@ -18,7 +18,8 @@ import {
 } from '@nestjs/common';
 import { RefreshTokenGuard, TokenGuard } from '../auth';
 import { CurrentUser, RequiredHeaders } from '../commons';
-import { AccountInput, AuthenticateAccountInput } from '../inputs';
+import { AuthenticateAccountInput, RegisterAccountInput } from '../inputs';
+import { AuthenticateAccountOutput, MeOutput } from '../outputs/account.output';
 
 @Controller('accounts')
 export class AccountsController {
@@ -41,8 +42,8 @@ export class AccountsController {
   @Post()
   async createAccount(
     @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,
-    @Body() body: AccountInput,
-  ) {
+    @Body() body: RegisterAccountInput,
+  ): Promise<void> {
     const { name, phone, email, lastName, password, username } = body;
     const tenantCode = headers['x-tenant-id'];
 
@@ -81,7 +82,7 @@ export class AccountsController {
   async authenticateAccount(
     @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,
     @Body() body: AuthenticateAccountInput,
-  ) {
+  ): Promise<AuthenticateAccountOutput> {
     const { email, password } = body;
     const tenantCode = headers['x-tenant-id'];
 
@@ -119,7 +120,7 @@ export class AccountsController {
   @Patch('me/refresh-token')
   async reAuthenticateAccount(
     @RequiredHeaders(['Authorization']) headers: Record<string, string>,
-  ) {
+  ): Promise<AuthenticateAccountOutput> {
     const response = await this.refreshTokenQuery.handle({
       refreshToken: headers['Authorization'],
     });
@@ -136,7 +137,7 @@ export class AccountsController {
   // @Permissions('accounts:read')
   @UseGuards(TokenGuard)
   @Get('me')
-  async me(@CurrentUser() user: UserRequester): Promise<UserRequester> {
+  async me(@CurrentUser() user: UserRequester): Promise<MeOutput> {
     return user;
   }
 }

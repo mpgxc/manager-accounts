@@ -8,7 +8,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class AccountInput {
+export class RegisterAccountInput {
   @IsString()
   @IsNotEmpty()
   name!: string;
