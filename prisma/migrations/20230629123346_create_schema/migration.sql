@@ -20,13 +20,12 @@ CREATE TABLE "accounts" (
 
 -- CreateTable
 CREATE TABLE "refresh_tokens" (
-    "id" TEXT NOT NULL,
     "refreshToken" TEXT NOT NULL,
     "expiresIn" TIMESTAMP(3) NOT NULL,
-    "accountId" TEXT,
+    "accountId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "refresh_tokens_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "refresh_tokens_pkey" PRIMARY KEY ("refreshToken","accountId")
 );
 
 -- CreateTable
@@ -95,6 +94,9 @@ CREATE UNIQUE INDEX "accounts_tenantCode_username_email_phone_key" ON "accounts"
 CREATE UNIQUE INDEX "refresh_tokens_refreshToken_key" ON "refresh_tokens"("refreshToken");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "refresh_tokens_accountId_key" ON "refresh_tokens"("accountId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "roles_name_key" ON "roles"("name");
 
 -- CreateIndex
@@ -107,7 +109,7 @@ CREATE UNIQUE INDEX "tenants_name_key" ON "tenants"("name");
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_tenantCode_fkey" FOREIGN KEY ("tenantCode") REFERENCES "tenants"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "accounts"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "accounts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "roles_permissions" ADD CONSTRAINT "roles_permissions_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
