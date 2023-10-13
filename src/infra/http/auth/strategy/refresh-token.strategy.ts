@@ -34,7 +34,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     super({
       ignoreExpiration: false,
       passReqToCallback: true,
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromHeader('refreshauthorization'),
       secretOrKeyProvider: RefreshTokenStrategy.getSecretKey(
         cacheManager,
         secretsManager,
