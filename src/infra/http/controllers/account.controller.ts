@@ -11,16 +11,34 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Inject,
   Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiHeader,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { RefreshTokenGuard, TokenGuard } from '../auth';
 import { CurrentUser, RequiredHeaders } from '../commons';
 import { AuthenticateAccountInput, RegisterAccountInput } from '../inputs';
-import { AuthenticateAccountOutput, MeOutput } from '../outputs/account.output';
+import {
+  AuthenticateAccountOutput,
+  BadRequestOutput,
+  MeOutput,
+  NotAuthorizedOutput,
+  NotFoundOutput,
+} from '../outputs/account.output';
 
+@ApiTags('accounts')
 @Controller('accounts')
 export class AccountsController {
   constructor(
@@ -40,6 +58,11 @@ export class AccountsController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiHeader({ name: 'x-tenant-id', required: true })
+  @ApiCreatedResponse({ description: 'Account created!' })
+  @ApiNotFoundResponse({ type: NotFoundOutput })
+  @ApiBadRequestResponse({ type: BadRequestOutput })
   async createAccount(
     @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,
     @Body() body: RegisterAccountInput,
@@ -79,6 +102,12 @@ export class AccountsController {
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
+  @ApiHeader({ name: 'x-tenant-id', required: true })
+  @ApiOkResponse({ type: AuthenticateAccountOutput })
+  @ApiNotFoundResponse({ type: NotFoundOutput })
+  @ApiBadRequestResponse({ type: BadRequestOutput })
+  @ApiUnauthorizedResponse({ type: NotAuthorizedOutput })
   async authenticateAccount(
     @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,
     @Body() body: AuthenticateAccountInput,
@@ -116,13 +145,17 @@ export class AccountsController {
     return response.value;
   }
 
-  @UseGuards(RefreshTokenGuard)
   @Patch('me/refresh-token')
+  @UseGuards(RefreshTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiHeader({ name: 'RefreshAuthorization', required: true })
+  @ApiOkResponse({ type: AuthenticateAccountOutput })
+  @ApiUnauthorizedResponse({ type: NotAuthorizedOutput })
   async reAuthenticateAccount(
-    @RequiredHeaders(['Authorization']) headers: Record<string, string>,
+    @RequiredHeaders(['RefreshAuthorization']) headers: Record<string, string>,
   ): Promise<AuthenticateAccountOutput> {
     const response = await this.refreshTokenQuery.handle({
-      refreshToken: headers['Authorization'],
+      refreshToken: headers['RefreshAuthorization'],
     });
 
     if (response.hasError) {
@@ -134,9 +167,12 @@ export class AccountsController {
     return response.value;
   }
 
-  // @Permissions('accounts:read')
-  @UseGuards(TokenGuard)
   @Get('me')
+  @UseGuards(TokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiHeader({ name: 'Authorization', required: true })
+  @ApiOkResponse({ type: MeOutput })
+  @ApiUnauthorizedResponse({ type: NotAuthorizedOutput })
   async me(@CurrentUser() user: UserRequester): Promise<MeOutput> {
     return user;
   }
