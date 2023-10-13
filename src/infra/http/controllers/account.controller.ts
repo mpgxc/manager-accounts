@@ -5,7 +5,7 @@ import { ApplicationErrorMapper } from '@commons/errors';
 import { RegisterAccountCommand } from '@domain/commands/register-account';
 import { AuthenticateAccountQuery } from '@domain/queries/authenticate-account';
 import { RefreshTokenQuery } from '@domain/queries/refresh-token';
-import { UserRequester } from '@global/express';
+import { UserRequester } from '@global/fastify';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import {
   Body,
@@ -37,7 +37,6 @@ import {
   NotAuthorizedOutput,
   NotFoundOutput,
 } from '../outputs/account.output';
-
 @ApiTags('accounts')
 @Controller('accounts')
 export class AccountsController {

@@ -1,6 +1,6 @@
 import { ImplGetAccountQuery } from '@application/queries/get-account';
 import { GetAccountQuery } from '@domain/queries/get-account';
-import { UserRequester } from '@global/express';
+import { UserRequester } from '@global/fastify';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import {
   ImplSecretsManagerProvider,
@@ -10,6 +10,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Cache } from 'cache-manager';
+import { FastifyRequest } from 'fastify';
 import { decode } from 'jsonwebtoken';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { firstValueFrom } from 'rxjs';
@@ -46,7 +47,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
   private static getSecretKey =
     (cacheManager: Cache, secretsManager: ImplSecretsManagerProvider) =>
     async (
-      request: Request,
+      _: FastifyRequest,
       jwtToken: string,
       done: (unknown?: any, secret?: string) => void,
     ) => {
@@ -70,7 +71,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     };
 
   async validate(
-    request: Request,
+    _: FastifyRequest,
     payload: TokenPayloadInput,
   ): Promise<UserRequester> {
     this.logger.log('Http > Auth > Refresh Token Strategy > Validate');

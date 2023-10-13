@@ -1,11 +1,10 @@
-import { UserRequester } from '@global/express';
+import { UserRequester } from '@global/fastify';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import {
   PERMISSIONS_KEY,
   PermissionsUnion,
 } from '../decorators/permissions.decorator';
-
 @Injectable()
 export class PermissionsGuard implements CanActivate {
   constructor(private reflector: Reflector) {}

@@ -15,7 +15,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { NextFunction } from 'express';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { firstValueFrom } from 'rxjs';
 import { TenantHeader } from '../inputs';
 import { InputDtosValidate } from './input-dtos-validate';
@@ -54,7 +54,7 @@ export class TenantMiddleware
     return true;
   }
 
-  async use(req: Request, res: Response, next: NextFunction) {
+  async use(req: FastifyRequest, res: FastifyReply, next: () => void) {
     const tenantCode = req.headers['x-tenant-id'] as string;
 
     const instance = Object.assign(new TenantHeader(), {

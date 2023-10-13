@@ -60,7 +60,7 @@ export class TokenStrategy extends PassportStrategy(Strategy, 'jwt') {
   private static getSecretKey =
     (cacheManager: Cache, secretsManager: ImplSecretsManagerProvider) =>
     async (
-      request: Request,
+      _: Request,
       jwtToken: string,
       done: (unknown?: any, secret?: string) => void,
     ) => {
