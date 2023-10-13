@@ -1,12 +1,30 @@
+import { LoggerService } from '@infra/providers/logger/logger.service';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { join } from 'node:path';
+import * as path from 'node:path';
 import { AppModule } from './app.module';
 
 (async () => {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter({
+      logger: true,
+    }),
+    {
+      rawBody: true,
+      bufferLogs: true,
+    },
+  );
+
+  const config = await app.resolve(ConfigService);
+  const logger = await app.resolve(LoggerService);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -17,6 +35,9 @@ import { AppModule } from './app.module';
       validateCustomDecorators: true,
     }),
   );
+
+  app.useLogger(logger);
+  app.setGlobalPrefix('api');
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.KAFKA,
@@ -38,14 +59,10 @@ import { AppModule } from './app.module';
     transport: Transport.GRPC,
     options: {
       package: 'accounts',
-      protoPath: join(__dirname, './infra/grpc/accounts.proto'),
+      protoPath: path.join(__dirname, './infra/grpc/accounts.proto'),
       url: `${process.env.GRPC_HOST!}:${process.env.GRPC_PORT!}`,
     },
   });
-
-  app.setGlobalPrefix('api');
-
-  await app.startAllMicroservices();
 
   const document = SwaggerModule.createDocument(
     app,
@@ -57,12 +74,14 @@ import { AppModule } from './app.module';
       .build(),
   );
 
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('api', app, document);
+
+  await app.startAllMicroservices();
 
   await app.listen(
-    Number(process.env.APP_PORT) || 3001,
-    process.env.APP_HOST || '0.0.0.0',
+    config.getOrThrow('APP.APP_PORT'),
+    config.getOrThrow('APP.APP_HOST'),
   );
 
-  console.log(`Server running 🚀: ${await app.getUrl()}/api`);
+  logger.debug(`Server running 🚀: ${await app.getUrl()}/api`);
 })();
