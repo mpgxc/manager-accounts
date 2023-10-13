@@ -1,4 +1,4 @@
-import { Request as RequestExpress } from 'express';
+import { FastifyRequest as Request } from 'fastify';
 
 type UserRequester = {
   id: string;
@@ -15,8 +15,8 @@ type UserRequester = {
   }>;
 };
 
-declare module 'express' {
-  interface Request extends RequestExpress {
+declare module 'fastify' {
+  interface FastifyRequest extends Request {
     user: UserRequester;
   }
 }
