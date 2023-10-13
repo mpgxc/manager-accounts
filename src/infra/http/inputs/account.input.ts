@@ -1,7 +1,8 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsMobilePhone,
   IsNotEmpty,
-  IsPhoneNumber,
   IsString,
   Matches,
   MaxLength,
@@ -9,14 +10,23 @@ import {
 } from 'class-validator';
 
 export class RegisterAccountInput {
+  @ApiProperty({
+    required: true,
+  })
   @IsString()
   @IsNotEmpty()
   name!: string;
 
+  @ApiProperty({
+    required: true,
+  })
   @IsString()
   @IsNotEmpty()
   lastName!: string;
 
+  @ApiProperty({
+    required: true,
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(6, {
@@ -24,15 +34,29 @@ export class RegisterAccountInput {
   })
   username!: string;
 
+  @ApiProperty({
+    required: true,
+  })
   @IsString()
   @IsNotEmpty()
-  @IsPhoneNumber('BR')
+  @IsMobilePhone('pt-BR')
   phone!: string;
 
+  @ApiProperty({
+    required: true,
+  })
+  @IsNotEmpty()
   @IsString()
   @IsEmail()
   email!: string;
 
+  @ApiProperty({
+    required: true,
+    minLength: 8,
+    maxLength: 32,
+    description:
+      'Password must contain at least one uppercase letter, one lowercase letter and one number or special character',
+  })
   @IsString()
   @MinLength(8, {
     message: 'Password must be at least 8 characters long',
@@ -48,10 +72,20 @@ export class RegisterAccountInput {
 }
 
 export class AuthenticateAccountInput {
+  @ApiProperty({
+    required: true,
+  })
   @IsString()
   @IsEmail()
   email!: string;
 
+  @ApiProperty({
+    required: true,
+    minLength: 8,
+    maxLength: 32,
+    description:
+      'Password must contain at least one uppercase letter, one lowercase letter and one number or special character',
+  })
   @IsString()
   @MinLength(8, {
     message: 'Password must be at least 8 characters long',
