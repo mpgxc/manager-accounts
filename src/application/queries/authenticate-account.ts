@@ -157,7 +157,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
         );
       }
 
-      await this.repository.tokens.create(
+      await this.repository.tokens.updateOrCreate(
         Token.build({
           accountId: account.id,
           expiresIn: refreshTokenExpiresIn.toDate(),
