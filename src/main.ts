@@ -43,12 +43,12 @@ import { AppModule } from './app.module';
     transport: Transport.KAFKA,
     options: {
       client: {
-        clientId: process.env.KAFKA_CLIENT_ID!,
-        brokers: [process.env.KAFKA_BROKER!],
+        clientId: config.getOrThrow<string>('KAFKA.KAFKA_CLIENT_ID'),
+        brokers: [config.getOrThrow<string>('KAFKA.KAFKA_BROKER')],
         sasl: {
           mechanism: 'scram-sha-256',
-          username: process.env.KAFKA_USERNAME!,
-          password: process.env.KAFKA_PASSWORD!,
+          username: config.getOrThrow<string>('KAFKA.KAFKA_USERNAME'),
+          password: config.getOrThrow<string>('KAFKA.KAFKA_PASSWORD'),
         },
         ssl: true,
       },
@@ -60,7 +60,9 @@ import { AppModule } from './app.module';
     options: {
       package: 'accounts',
       protoPath: path.join(__dirname, './infra/grpc/accounts.proto'),
-      url: `${process.env.GRPC_HOST!}:${process.env.GRPC_PORT!}`,
+      url: `${config.getOrThrow<string>(
+        'GRPC.GRPC_HOST',
+      )}:${config.getOrThrow<string>('GRPC.GRPC_PORT')}`,
     },
   });
 
