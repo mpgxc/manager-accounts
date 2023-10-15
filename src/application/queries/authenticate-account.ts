@@ -20,15 +20,8 @@ import { JwtService } from '@nestjs/jwt';
 import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
 
-type MixinAuthenticateRepository = {
-  tokens: TokenRepository;
-  accounts: AccountRepository;
-};
-
 @Injectable()
 class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
-  private repository!: MixinAuthenticateRepository;
-
   constructor(
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
@@ -45,11 +38,6 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
     private readonly jwtService: JwtService,
   ) {
     this.logger.setContext(ImplRegisterAccountCommand.name);
-
-    this.repository = {
-      tokens: this.tokenRepository,
-      accounts: this.accountRepository,
-    };
   }
 
   async handle({
@@ -58,7 +46,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
     tenantCode,
   }: AuthenticateAccountQueryInput): Promise<AuthenticateAccountQueryOutput> {
     try {
-      const account = await this.repository.accounts.findBy({
+      const account = await this.accountRepository.findBy({
         email,
         tenantCode,
       });
@@ -125,8 +113,8 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
         },
       );
 
-      const refreshExpiresIn = Number(
-        this.config.get('JWT.JWT_REFRESH_EXPIRES_IN'),
+      const refreshExpiresIn = this.config.getOrThrow<number>(
+        'JWT.JWT_REFRESH_EXPIRES_IN',
       );
 
       const refreshTokenExpiresIn = dayjs().add(refreshExpiresIn, 'minutes');
@@ -139,7 +127,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
           privateKey: secrets.value.jwt_refresh_secret_key,
           audience: 'RefreshToken',
           issuer: `uzze_accounts_${tenantCode}`,
-          expiresIn: `${refreshTokenExpiresIn.minute()}m`,
+          expiresIn: `${refreshExpiresIn}m`,
           subject: account.id,
           header: {
             typ: 'RJWT',
@@ -148,7 +136,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
         },
       );
 
-      if (await this.repository.tokens.findById(refreshToken)) {
+      if (await this.tokenRepository.exists(refreshToken)) {
         return Result.failure(
           ApplicationError.build({
             message: 'Cant authenticate account! Many refresh tokens!',
@@ -157,7 +145,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
         );
       }
 
-      await this.repository.tokens.updateOrCreate(
+      await this.tokenRepository.updateOrCreate(
         Token.build({
           accountId: account.id,
           expiresIn: refreshTokenExpiresIn.toDate(),
