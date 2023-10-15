@@ -36,5 +36,4 @@ export {
   AuthenticateAccountQuery,
   AuthenticateAccountQueryInput,
   AuthenticateAccountQueryOutput,
-  AuthenticateAccountQueryOutputProps,
 };
