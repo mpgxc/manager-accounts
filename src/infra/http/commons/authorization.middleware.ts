@@ -4,7 +4,7 @@ import {
   NestMiddleware,
 } from '@nestjs/common';
 
-import { NextFunction, Request, Response } from 'express';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { AuthorizationHeader } from '../inputs/headers.input';
 import { InputDtosValidate } from './input-dtos-validate';
 
@@ -13,16 +13,15 @@ export class AuthorizationMiddleware
   extends InputDtosValidate
   implements NestMiddleware
 {
-  async use(req: Request, res: Response, next: NextFunction) {
+  async use(req: FastifyRequest, res: FastifyReply, next: () => void) {
     const { authorization } = req.headers as Record<string, string>;
 
     const instance = Object.assign(new AuthorizationHeader(), {
       authorization,
     });
 
-    const { exceptions, hasError } = await this.validate<AuthorizationHeader>(
-      instance,
-    );
+    const { exceptions, hasError } =
+      await this.validate<AuthorizationHeader>(instance);
 
     if (hasError) {
       throw new BadRequestException(exceptions);

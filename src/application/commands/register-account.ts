@@ -12,6 +12,7 @@ import { KafkaProducerService } from '@infra/messaging/kafka-producer.service';
 import { ImplHasherProvider } from '@infra/providers/hasher';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import { Inject, Injectable } from '@nestjs/common';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 class ImplRegisterAccountCommand implements RegisterAccountCommand {
@@ -63,7 +64,9 @@ class ImplRegisterAccountCommand implements RegisterAccountCommand {
 
       await this.repository.create(account);
 
-      this.kafkaService.emit('tenants.created', account.props);
+      await firstValueFrom(
+        this.kafkaService.emit('tenants.created', account.props),
+      );
 
       return Result.success();
     } catch (error) {

@@ -1,6 +1,6 @@
 import { ImplGetAccountQuery } from '@application/queries/get-account';
 import { GetAccountQuery } from '@domain/queries/get-account';
-import { UserRequester } from '@global/express';
+import { UserRequester } from '@global/fastify';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import {
   ImplSecretsManagerProvider,
@@ -10,6 +10,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Cache } from 'cache-manager';
+import { FastifyRequest } from 'fastify';
 import { decode } from 'jsonwebtoken';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { firstValueFrom } from 'rxjs';
@@ -32,37 +33,49 @@ export class RefreshTokenStrategy extends PassportStrategy(
   ) {
     super({
       ignoreExpiration: false,
+      passReqToCallback: true,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKeyProvider: async (
-        request: Request,
-        jwtToken: string,
-        done: (unknown?: any, secret?: string) => void,
-      ) => {
-        const user = decode(jwtToken) as TokenPayloadInput;
-
-        if (!user) return done();
-
-        let secrets = await this.cacheManager.get<SecretsManagerOutput>(
-          `${user.tenantCode}_SECRETS`,
-        );
-
-        if (!secrets) {
-          secrets = await firstValueFrom(
-            this.secretsManager.get({ key: user.tenantCode }),
-          );
-
-          await this.cacheManager.set(`${user.tenantCode}_SECRETS`, secrets);
-        }
-
-        return done(null, secrets.value.jwt_refresh_public_key);
-      },
+      secretOrKeyProvider: RefreshTokenStrategy.getSecretKey(
+        cacheManager,
+        secretsManager,
+      ),
     });
 
     this.logger.setContext(RefreshTokenStrategy.name);
   }
 
+  private static getSecretKey =
+    (cacheManager: Cache, secretsManager: ImplSecretsManagerProvider) =>
+    async (
+      request: FastifyRequest,
+      jwtToken: string,
+      done: (unknown?: any, secret?: string) => void,
+    ) => {
+      const user = decode(jwtToken) as TokenPayloadInput;
+
+      if (!user) return done();
+
+      request.headers['authorization'] = request.headers.authorization
+        ?.replace('Bearer', '')
+        .trim();
+
+      let secrets = await cacheManager.get<SecretsManagerOutput>(
+        `${user.tenantCode}_SECRETS`,
+      );
+
+      if (!secrets) {
+        secrets = await firstValueFrom(
+          secretsManager.get({ key: user.tenantCode }),
+        );
+
+        await cacheManager.set(`${user.tenantCode}_SECRETS`, secrets);
+      }
+
+      return done(null, secrets.value.jwt_refresh_public_key);
+    };
+
   async validate(
-    request: Request,
+    _: FastifyRequest,
     payload: TokenPayloadInput,
   ): Promise<UserRequester> {
     this.logger.log('Http > Auth > Refresh Token Strategy > Validate');
@@ -84,18 +97,6 @@ export class RefreshTokenStrategy extends PassportStrategy(
 
     this.logger.log('Http > Auth > Refresh Token Strategy > Success');
 
-    const [, refreshToken] = request.headers['Authorization'].split(' ');
-
-    return {
-      avatar: account.value.avatar,
-      email: account.value.email,
-      id: account.value.id,
-      lastName: account.value.lastName,
-      name: account.value.name,
-      phone: account.value.phone,
-      roles: account.value.roles,
-      tenantCode: account.value.tenantCode,
-      username: account.value.username,
-    };
+    return account.value;
   }
 }

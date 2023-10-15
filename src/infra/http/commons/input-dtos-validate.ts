@@ -8,7 +8,7 @@ export abstract class InputDtosValidate {
       return (acc[property] = Object.values(constraints || {}));
     }, {}) as Record<string, string[]>;
 
-    const hasError = Object.keys(exceptions).length;
+    const hasError = !!Object.keys(exceptions).length;
 
     return {
       hasError,

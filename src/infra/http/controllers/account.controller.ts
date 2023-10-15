@@ -1,25 +1,44 @@
 import { ImplRegisterAccountCommand } from '@application/commands/register-account';
 import { ImplAuthenticateAccountQuery } from '@application/queries/authenticate-account';
+import { ImplRefreshTokenQuery } from '@application/queries/refresh-token';
 import { ApplicationErrorMapper } from '@commons/errors';
 import { RegisterAccountCommand } from '@domain/commands/register-account';
 import { AuthenticateAccountQuery } from '@domain/queries/authenticate-account';
 import { RefreshTokenQuery } from '@domain/queries/refresh-token';
-import { UserRequester } from '@global/express';
+import { UserRequester } from '@global/fastify';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Inject,
   Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiHeader,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { FastifyRequest } from 'fastify';
 import { RefreshTokenGuard, TokenGuard } from '../auth';
 import { CurrentUser, RequiredHeaders } from '../commons';
-import { AccountInput, AuthenticateAccountInput } from '../inputs';
-import { ImplRefreshTokenQuery } from '@application/queries/refresh-token';
-
+import { AuthenticateAccountInput, RegisterAccountInput } from '../inputs';
+import {
+  AuthenticateAccountOutput,
+  BadRequestOutput,
+  MeOutput,
+  NotAuthorizedOutput,
+  NotFoundOutput,
+} from '../outputs/account.output';
+@ApiTags('accounts')
 @Controller('accounts')
 export class AccountsController {
   constructor(
@@ -39,10 +58,15 @@ export class AccountsController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiHeader({ name: 'x-tenant-id', required: true })
+  @ApiCreatedResponse({ description: 'Account created!' })
+  @ApiNotFoundResponse({ type: NotFoundOutput })
+  @ApiBadRequestResponse({ type: BadRequestOutput })
   async createAccount(
     @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,
-    @Body() body: AccountInput,
-  ) {
+    @Body() body: RegisterAccountInput,
+  ): Promise<void> {
     const { name, phone, email, lastName, password, username } = body;
     const tenantCode = headers['x-tenant-id'];
 
@@ -78,10 +102,16 @@ export class AccountsController {
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
+  @ApiHeader({ name: 'x-tenant-id', required: true })
+  @ApiOkResponse({ type: AuthenticateAccountOutput })
+  @ApiNotFoundResponse({ type: NotFoundOutput })
+  @ApiBadRequestResponse({ type: BadRequestOutput })
+  @ApiUnauthorizedResponse({ type: NotAuthorizedOutput })
   async authenticateAccount(
     @RequiredHeaders(['x-tenant-id']) headers: Record<string, string>,
     @Body() body: AuthenticateAccountInput,
-  ) {
+  ): Promise<AuthenticateAccountOutput> {
     const { email, password } = body;
     const tenantCode = headers['x-tenant-id'];
 
@@ -115,15 +145,17 @@ export class AccountsController {
     return response.value;
   }
 
-  @UseGuards(RefreshTokenGuard)
   @Patch('me/refresh-token')
-  async reAuthenticateAccount(@CurrentUser() user: UserRequester) {
-    console.log({
-      user,
-    });
-
+  @UseGuards(RefreshTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiHeader({ name: 'Authorization', required: true })
+  @ApiOkResponse({ type: AuthenticateAccountOutput })
+  @ApiUnauthorizedResponse({ type: NotAuthorizedOutput })
+  async reAuthenticateAccount(
+    @RequiredHeaders(['Authorization']) headers: FastifyRequest['headers'],
+  ): Promise<AuthenticateAccountOutput> {
     const response = await this.refreshTokenQuery.handle({
-      refreshToken: '',
+      refreshToken: headers['authorization']!,
     });
 
     if (response.hasError) {
@@ -135,10 +167,13 @@ export class AccountsController {
     return response.value;
   }
 
-  // @Permissions('accounts:read')
-  @UseGuards(TokenGuard)
   @Get('me')
-  async me(@CurrentUser() user: UserRequester): Promise<UserRequester> {
+  @UseGuards(TokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiHeader({ name: 'Authorization', required: true })
+  @ApiOkResponse({ type: MeOutput })
+  @ApiUnauthorizedResponse({ type: NotAuthorizedOutput })
+  async me(@CurrentUser() user: UserRequester): Promise<MeOutput> {
     return user;
   }
 }

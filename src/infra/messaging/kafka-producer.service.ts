@@ -3,6 +3,10 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientKafka } from '@nestjs/microservices';
 
+export class KafkaProducerServiceDummy {
+  emit() {}
+}
+
 @Injectable()
 export class KafkaProducerService
   extends ClientKafka

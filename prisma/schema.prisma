@@ -8,20 +8,20 @@ datasource db {
 }
 
 model Accounts {
-  id            String   @id @default(uuid())
+  id            String        @id @default(uuid())
   name          String
   username      String
   password      String
   lastName      String
   phone         String
   email         String
-  emailVerified Boolean  @default(false)
+  emailVerified Boolean       @default(false)
   acceptedTerms Boolean
   avatar        String?
   lastAccess    DateTime
+  refreshToken  RefreshToken?
 
-  roles         AccountsRoles[]
-  refreshTokens RefreshTokens[]
+  roles AccountsRoles[]
 
   tenant     Tenants @relation(fields: [tenantCode], references: [name])
   tenantCode String
@@ -36,16 +36,15 @@ model Accounts {
   @@map("accounts")
 }
 
-model RefreshTokens {
-  id           String   @id @default(uuid())
+model RefreshToken {
   refreshToken String   @unique
   expiresIn    DateTime
-
-  account   Accounts? @relation(fields: [accountId], references: [id])
-  accountId String?
+  accountId    String   @unique
+  account      Accounts @relation(fields: [accountId], references: [id])
 
   createdAt DateTime @default(now())
 
+  @@id([refreshToken, accountId])
   @@map("refresh_tokens")
 }
 

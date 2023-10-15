@@ -48,31 +48,38 @@ export class TokenStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       ignoreExpiration: false,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKeyProvider: async (
-        request: Request,
-        jwtToken: string,
-        done: (unknown: null, secret: string) => void,
-      ) => {
-        const user = decode(jwtToken) as TokenPayloadInput;
-
-        let secrets = await this.cacheManager.get<SecretsManagerOutput>(
-          `${user.tenantCode}_SECRETS`,
-        );
-
-        if (!secrets) {
-          secrets = await firstValueFrom(
-            this.secretsManager.get({ key: user.tenantCode }),
-          );
-
-          await this.cacheManager.set(`${user.tenantCode}_SECRETS`, secrets);
-        }
-
-        return done(null, secrets?.value.jwt_public_key);
-      },
+      secretOrKeyProvider: TokenStrategy.getSecretKey(
+        cacheManager,
+        secretsManager,
+      ),
     });
 
     this.logger.setContext(TokenStrategy.name);
   }
+
+  private static getSecretKey =
+    (cacheManager: Cache, secretsManager: ImplSecretsManagerProvider) =>
+    async (
+      _: Request,
+      jwtToken: string,
+      done: (unknown?: any, secret?: string) => void,
+    ) => {
+      const user = decode(jwtToken) as TokenPayloadInput;
+
+      let secrets = await cacheManager.get<SecretsManagerOutput>(
+        `${user.tenantCode}_SECRETS`,
+      );
+
+      if (!secrets) {
+        secrets = await firstValueFrom(
+          secretsManager.get({ key: user.tenantCode }),
+        );
+
+        await cacheManager.set(`${user.tenantCode}_SECRETS`, secrets);
+      }
+
+      return done(null, secrets?.value.jwt_public_key);
+    };
 
   async validate(
     payload: TokenPayloadInput,

@@ -25,6 +25,7 @@ class ApplicationErrorMapper {
     CantAuthenticateAccount: UnauthorizedException,
     TenantNotFound: NotFoundException,
     TenantAlreadyExists: ConflictException,
+    CantRefreshToken: UnauthorizedException,
   };
 }
 

@@ -1,4 +1,4 @@
-import { UserRequester } from '@global/express';
+import { UserRequester } from '@global/fastify';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY, RolesUnion } from '../decorators/roles.decorator';

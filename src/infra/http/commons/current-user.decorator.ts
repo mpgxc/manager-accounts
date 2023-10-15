@@ -1,5 +1,5 @@
+import { UserRequester } from '@global/fastify';
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { UserRequester } from '../../../../global/express';
 
 export const CurrentUser = createParamDecorator(
   (_, ctx: ExecutionContext): UserRequester =>

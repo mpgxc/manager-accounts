@@ -9,11 +9,11 @@ const jwtSchema = z.object({
 
 const appSchema = z.object({
   APP_PORT: z.string().default('3003'),
-  APP_HOST: z.string().default('localhost'),
+  APP_HOST: z.string().default('0.0.0.0'),
 });
 
 const grpcSchema = z.object({
-  GRPC_HOST: z.string().default('localhost'),
+  GRPC_HOST: z.string().default('0.0.0.0'),
   GRPC_PORT: z.string().default('5000'),
   SM_GRPC_PACKAGE: z.string().nonempty(),
 });
