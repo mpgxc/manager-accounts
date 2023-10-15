@@ -27,6 +27,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { FastifyRequest } from 'fastify';
 import { RefreshTokenGuard, TokenGuard } from '../auth';
 import { CurrentUser, RequiredHeaders } from '../commons';
 import { AuthenticateAccountInput, RegisterAccountInput } from '../inputs';
@@ -147,14 +148,14 @@ export class AccountsController {
   @Patch('me/refresh-token')
   @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.OK)
-  @ApiHeader({ name: 'RefreshAuthorization', required: true })
+  @ApiHeader({ name: 'Authorization', required: true })
   @ApiOkResponse({ type: AuthenticateAccountOutput })
   @ApiUnauthorizedResponse({ type: NotAuthorizedOutput })
   async reAuthenticateAccount(
-    @RequiredHeaders(['RefreshAuthorization']) headers: Record<string, string>,
+    @RequiredHeaders(['Authorization']) headers: FastifyRequest['headers'],
   ): Promise<AuthenticateAccountOutput> {
     const response = await this.refreshTokenQuery.handle({
-      refreshToken: headers['RefreshAuthorization'],
+      refreshToken: headers['authorization']!,
     });
 
     if (response.hasError) {

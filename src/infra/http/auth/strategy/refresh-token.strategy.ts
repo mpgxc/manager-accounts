@@ -34,7 +34,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     super({
       ignoreExpiration: false,
       passReqToCallback: true,
-      jwtFromRequest: ExtractJwt.fromHeader('refreshauthorization'),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKeyProvider: RefreshTokenStrategy.getSecretKey(
         cacheManager,
         secretsManager,
@@ -47,13 +47,17 @@ export class RefreshTokenStrategy extends PassportStrategy(
   private static getSecretKey =
     (cacheManager: Cache, secretsManager: ImplSecretsManagerProvider) =>
     async (
-      _: FastifyRequest,
+      request: FastifyRequest,
       jwtToken: string,
       done: (unknown?: any, secret?: string) => void,
     ) => {
       const user = decode(jwtToken) as TokenPayloadInput;
 
       if (!user) return done();
+
+      request.headers['authorization'] = request.headers.authorization
+        ?.replace('Bearer', '')
+        .trim();
 
       let secrets = await cacheManager.get<SecretsManagerOutput>(
         `${user.tenantCode}_SECRETS`,
