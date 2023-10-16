@@ -17,14 +17,14 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Cache } from 'cache-manager';
+import { Cache as Cachemanager } from 'cache-manager';
 import dayjs from 'dayjs';
 
 @Injectable()
 class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
   constructor(
     @Inject(CACHE_MANAGER)
-    private readonly cacheManager: Cache,
+    private readonly cacheManager: Cachemanager,
 
     @Inject(ImplAccountRepository.name)
     private readonly accountRepository: AccountRepository,

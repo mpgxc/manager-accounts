@@ -1,4 +1,5 @@
 import { ImplGetAccountQuery } from '@application/queries/get-account';
+import { CacheTTL } from '@commons/types';
 import { GetAccountQuery } from '@domain/queries/get-account';
 import { UserRequester } from '@global/fastify';
 import { LoggerService } from '@infra/providers/logger/logger.service';
@@ -9,7 +10,7 @@ import {
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Cache } from 'cache-manager';
+import { Cache as CacheManager } from 'cache-manager';
 import { FastifyRequest } from 'fastify';
 import { decode } from 'jsonwebtoken';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -26,7 +27,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     private readonly getAccountQuery: GetAccountQuery,
 
     @Inject(CACHE_MANAGER)
-    private readonly cacheManager: Cache,
+    private readonly cacheManager: CacheManager,
 
     private readonly logger: LoggerService,
     private readonly secretsManager: ImplSecretsManagerProvider,
@@ -45,7 +46,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
   }
 
   private static getSecretKey =
-    (cacheManager: Cache, secretsManager: ImplSecretsManagerProvider) =>
+    (cacheManager: CacheManager, secretsManager: ImplSecretsManagerProvider) =>
     async (
       request: FastifyRequest,
       jwtToken: string,
@@ -68,7 +69,11 @@ export class RefreshTokenStrategy extends PassportStrategy(
           secretsManager.get({ key: user.tenantCode }),
         );
 
-        await cacheManager.set(`${user.tenantCode}_SECRETS`, secrets);
+        await cacheManager.set(
+          `${user.tenantCode}_SECRETS`,
+          secrets,
+          CacheTTL.ONE_DAY,
+        );
       }
 
       return done(null, secrets.value.jwt_refresh_public_key);

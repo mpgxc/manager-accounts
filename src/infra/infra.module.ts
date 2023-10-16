@@ -5,7 +5,9 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PassportModule } from '@nestjs/passport';
+import { redisStore } from 'cache-manager-redis-yet';
 import * as path from 'node:path';
+import { type RedisClientOptions } from 'redis';
 import { DatabaseModule } from './database/database.module';
 import { configuration } from './environment';
 import { InfraHttpModule } from './http/http.module';
@@ -41,9 +43,10 @@ const InfraContainerInject = [
       isGlobal: true,
       load: [configuration],
     }),
-    CacheModule.register({
+    CacheModule.register<RedisClientOptions>({
       isGlobal: true,
-      ttl: 60 * 60 * 24, // 1 day
+      url: process.env.REDIS_URL,
+      store: redisStore,
     }),
     JwtModule.register({
       global: true,
