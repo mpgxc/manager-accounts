@@ -17,11 +17,10 @@ import {
   ImplSecretsManagerProvider,
   SecretsManagerPackage,
 } from './providers/secrets-manager';
-import { ImplTokensProvider } from './providers/tokens/tokens.provider';
+import { ImplTokensProvider } from './providers/tokens';
 
 const InfraContainerInject = [
   ImplSecretsManagerProvider,
-  ApplicationErrorMapper,
   ImplTokensProvider,
   ImplHasherProvider,
   LoggerService,

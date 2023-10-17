@@ -11,35 +11,28 @@ import { ImplAccountRepository } from '@infra/database/repositories';
 import { ImplTokenRepository } from '@infra/database/repositories/token-repository';
 import { TokenPayloadInput } from '@infra/http/auth';
 import { LoggerService } from '@infra/providers/logger/logger.service';
-import { SecretsManagerOutput } from '@infra/providers/secrets-manager';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { ImplTokensProvider } from '@infra/providers/tokens';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Cache as Cachemanager } from 'cache-manager';
 import dayjs from 'dayjs';
-import { decode } from 'jsonwebtoken';
 
-/**
- * @implements {RefreshTokenQuery}
- * @description Essa classe será refatora da generalizar a criação de tokens
- */
 @Injectable()
 class ImplRefreshTokenQuery implements RefreshTokenQuery {
   constructor(
-    private readonly logger: LoggerService,
-    private readonly jwtService: JwtService,
-    private readonly config: ConfigService,
-
-    @Inject(CACHE_MANAGER)
-    private readonly cacheManager: Cachemanager,
-
     @Inject(ImplTokenRepository.name)
     private readonly tokenRepository: TokenRepository,
 
     @Inject(ImplAccountRepository.name)
     private readonly accountRepository: AccountRepository,
-  ) {}
+
+    private readonly jwtService: JwtService,
+    private readonly logger: LoggerService,
+    private readonly config: ConfigService,
+    private readonly tokens: ImplTokensProvider,
+  ) {
+    this.logger.setContext(ImplRefreshTokenQuery.name);
+  }
 
   async handle(
     props: RefreshTokenQueryInput,
@@ -58,84 +51,60 @@ class ImplRefreshTokenQuery implements RefreshTokenQuery {
         );
       }
 
-      const { sub } = decode(props.refreshToken) as TokenPayloadInput;
+      const { sub, tenantCode } = this.jwtService.decode(
+        props.refreshToken,
+      ) as TokenPayloadInput;
 
       const account = await this.accountRepository.findById(sub);
 
       if (!account) {
         return Result.failure(
           ApplicationError.build({
-            message: 'Cant authenticate account! Invalid credentials!',
-            name: 'CantAuthenticateAccount',
+            message: 'Cant refresh token! Invalid refresh token!',
+            name: 'CantRefreshToken',
           }),
         );
       }
 
-      const roles = account.props.roles.map((role) => ({
-        role: role.props.name,
-        permissions: role.props.permissions.map(({ props }) => props.name),
-      }));
+      await this.tokens.onInit(tenantCode);
 
-      const secrets = await this.cacheManager.get<SecretsManagerOutput>(
-        `${account.props.tenantCode}_SECRETS`,
-      );
-
-      if (!secrets) {
-        return Result.failure(
-          ApplicationError.build({
-            message: 'Cant authenticate account! Invalid credentials!',
-            name: 'CantAuthenticateAccount',
-          }),
-        );
-      }
-
-      const token = await this.jwtService.signAsync(
+      const token = await this.tokens.buildAccessToken(
         {
           email: account.props.email,
           username: account.props.username,
-          tenantCode: account.props.tenantCode,
-          roles,
+          roles: account.rolePermissions,
+          tenantCode,
         },
         {
-          privateKey: secrets.value.jwt_secret_key,
-          audience: 'AccessToken',
-          issuer: `uzze_accounts_${account.props.tenantCode}`,
-          expiresIn: `${this.config.get('JWT.JWT_TOKEN_EXPIRES_IN')}m`,
+          issuer: tenantCode,
           subject: account.id,
-          header: {
-            typ: 'JWT',
-            alg: 'RS256',
-          },
         },
       );
 
-      const refreshExpiresIn = this.config.getOrThrow<number>(
-        'JWT.JWT_REFRESH_EXPIRES_IN',
-      );
-
-      const refreshTokenExpiresIn = dayjs().add(refreshExpiresIn, 'minutes');
-
-      const refreshToken = await this.jwtService.signAsync(
+      const refreshToken = await this.tokens.buildRefreshToken(
         {
-          tenantCode: account.props.tenantCode,
+          tenantCode,
         },
         {
-          privateKey: secrets.value.jwt_refresh_secret_key,
-          audience: 'RefreshToken',
-          issuer: `uzze_accounts_${account.props.tenantCode}`,
-          expiresIn: `${refreshExpiresIn}m`,
+          issuer: tenantCode,
           subject: account.id,
-          header: {
-            typ: 'RJWT',
-            alg: 'RS256',
-          },
         },
       );
 
+      const expiresIn = dayjs().add(
+        this.config.getOrThrow<number>('JWT.JWT_REFRESH_EXPIRES_IN'),
+        'minutes',
+      );
+
+      /**
+       * Observação: O refresh token não está sendo criptografado
+       * TODO: Criptografar refresh token
+       * TODO: Refatorar o armazenamento de refresh tokens para um redis
+       */
       await this.tokenRepository.update(
         Token.build({
           accountId: account.id,
-          expiresIn: refreshTokenExpiresIn.toDate(),
+          expiresIn: expiresIn.toDate(),
           refreshToken,
         }),
       );

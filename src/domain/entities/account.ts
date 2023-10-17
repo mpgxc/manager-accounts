@@ -102,6 +102,16 @@ class Account extends AggregateRoot<AccountProps> {
     this.selfUpdate();
   }
 
+  /**
+   * @description Return all roles and permissions from account
+   */
+  public get rolePermissions() {
+    return this._props.roles.map((role) => ({
+      role: role.props.name,
+      permissions: role.props.permissions.map(({ props }) => props.name),
+    }));
+  }
+
   static build(
     props: Replace<
       AccountProps,
