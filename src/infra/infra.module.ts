@@ -1,4 +1,3 @@
-import { ApplicationErrorMapper } from '@commons/errors';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -16,11 +15,12 @@ import {
   ImplSecretsManagerProvider,
   SecretsManagerPackage,
 } from './providers/secrets-manager';
+import { ImplTokensProvider } from './providers/tokens/tokens.provider';
 
 const InfraContainerInject = [
   ImplSecretsManagerProvider,
-  ApplicationErrorMapper,
   ImplHasherProvider,
+  ImplTokensProvider,
   LoggerService,
 ];
 

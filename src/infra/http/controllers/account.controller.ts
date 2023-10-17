@@ -1,7 +1,7 @@
 import { ImplRegisterAccountCommand } from '@application/commands/register-account';
 import { ImplAuthenticateAccountQuery } from '@application/queries/authenticate-account';
 import { ImplRefreshTokenQuery } from '@application/queries/refresh-token';
-import { ApplicationErrorMapper } from '@commons/errors';
+import { ExceptionMapper } from '@commons/errors';
 import { RegisterAccountCommand } from '@domain/commands/register-account';
 import { AuthenticateAccountQuery } from '@domain/queries/authenticate-account';
 import { RefreshTokenQuery } from '@domain/queries/refresh-token';
@@ -51,7 +51,6 @@ export class AccountsController {
     @Inject(ImplRefreshTokenQuery.name)
     private readonly refreshTokenQuery: RefreshTokenQuery,
 
-    private readonly errorMapper: ApplicationErrorMapper,
     private readonly logger: LoggerService,
   ) {
     this.logger.setContext(AccountsController.name);
@@ -90,9 +89,7 @@ export class AccountsController {
         `Infra > Http > Controller > Create Account > Failure: ${response.value.message}`,
       );
 
-      throw new this.errorMapper.toException[response.value.name](
-        response.value.message,
-      );
+      throw ExceptionMapper(response.value);
     }
 
     this.logger.log('Infra > Http > Controller > Create Account > Success', {
@@ -130,9 +127,7 @@ export class AccountsController {
         `Infra > Http > Controller > Authenticate Account > Failure: ${response.value.message}`,
       );
 
-      throw new this.errorMapper.toException[response.value.name](
-        response.value.message,
-      );
+      throw ExceptionMapper(response.value);
     }
 
     this.logger.log(
@@ -159,9 +154,11 @@ export class AccountsController {
     });
 
     if (response.hasError) {
-      throw new this.errorMapper.toException[response.value.name](
-        response.value.message,
+      this.logger.warn(
+        `Infra > Http > Controller > ReAuthenticate Account > Failure: ${response.value.message}`,
       );
+
+      throw ExceptionMapper(response.value);
     }
 
     return response.value;
