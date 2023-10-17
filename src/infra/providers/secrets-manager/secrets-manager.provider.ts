@@ -10,7 +10,7 @@ import {
 } from './secrets-manager.interface';
 
 @Injectable()
-class ImplSecretsManagerProvider
+export class ImplSecretsManagerProvider
   implements SecretsManagerProvider, OnModuleInit
 {
   private secretsService!: SecretsManagerProvider;
@@ -30,5 +30,3 @@ class ImplSecretsManagerProvider
     return this.secretsService.get({ key });
   }
 }
-
-export { ImplSecretsManagerProvider };
