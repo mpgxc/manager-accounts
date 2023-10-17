@@ -1,4 +1,3 @@
-import { ImplRegisterAccountCommand } from '@application/commands/register-account';
 import { ApplicationError } from '@commons/errors';
 import { Result } from '@commons/logic';
 import {
@@ -31,7 +30,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
     private readonly logger: LoggerService,
     private readonly config: ConfigService,
   ) {
-    this.logger.setContext(ImplRegisterAccountCommand.name);
+    this.logger.setContext(ImplAuthenticateAccountQuery.name);
   }
 
   async handle({
@@ -70,18 +69,12 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
         );
       }
 
-      //TODO: Tem que virar mapper!
-      const roles = account.props.roles.map((role) => ({
-        role: role.props.name,
-        permissions: role.props.permissions.map(({ props }) => props.name),
-      }));
-
       const token = await this.tokens.buildAccessToken(
         {
           email: account.props.email,
           username: account.props.username,
           tenantCode,
-          roles,
+          roles: account.rolePermissions,
         },
         {
           issuer: tenantCode,
@@ -89,7 +82,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
         },
       );
 
-      const refreshToken = await this.tokens.buildAccessToken(
+      const refreshToken = await this.tokens.buildRefreshToken(
         {
           tenantCode,
         },
