@@ -1,32 +1,49 @@
+import { ApplicationError, ApplicationErrorType } from '@commons/errors';
 import {
-  BadRequestException,
   ConflictException,
-  ForbiddenException,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 
-import { ApplicationErrorType } from '.';
+const exceptionMapper = <T extends ApplicationErrorType[]>(
+  token: ApplicationErrorType,
+) => {
+  if (['UnexpectedError'].includes(token)) {
+    return InternalServerErrorException;
+  }
 
-type HttpExceptionType =
-  | typeof NotFoundException
-  | typeof ConflictException
-  | typeof ForbiddenException
-  | typeof BadRequestException;
+  if ((['AccountNotFound', 'TenantNotFound'] as T).includes(token)) {
+    return NotFoundException;
+  }
 
-class ApplicationErrorMapper {
-  toException: Record<ApplicationErrorType, HttpExceptionType> = {
-    AccountNotFound: NotFoundException,
-    UnexpectedError: BadRequestException,
-    AccountAlreadyExists: ConflictException,
-    AccountUnauthorizedAccess: ForbiddenException,
-    EmailAlreadyRegistered: ConflictException,
-    AccountCantRegister: UnauthorizedException,
-    CantAuthenticateAccount: UnauthorizedException,
-    TenantNotFound: NotFoundException,
-    TenantAlreadyExists: ConflictException,
-    CantRefreshToken: UnauthorizedException,
-  };
-}
+  if (
+    (
+      [
+        'AccountAlreadyExists',
+        'EmailAlreadyRegistered',
+        'TenantAlreadyExists',
+      ] as T
+    ).includes(token)
+  ) {
+    return ConflictException;
+  }
 
-export { ApplicationErrorMapper };
+  if (
+    (
+      [
+        'AccountCantRegister',
+        'AccountUnauthorizedAccess',
+        'CantRefreshToken',
+        'CantAuthenticateAccount',
+      ] as T
+    ).includes(token)
+  ) {
+    return UnauthorizedException;
+  }
+
+  return InternalServerErrorException;
+};
+
+export const ExceptionMapper = ({ name, message }: ApplicationError) =>
+  new (exceptionMapper(name))(message);
