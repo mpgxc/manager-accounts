@@ -1,4 +1,4 @@
-import { RegexPatternsEnum } from '@commons/types';
+import { RegexPatterns } from '@commons/types';
 import { Expose } from 'class-transformer';
 import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
@@ -10,7 +10,7 @@ export type TenantHeaderKeys = keyof TenantHeader;
 export class TenantHeader {
   @IsString()
   @IsNotEmpty()
-  @Matches(RegexPatternsEnum.TENANT_HEADER, {
+  @Matches(RegexPatterns.TENANT_HEADER, {
     message: 'Invalid Tenant Header',
   })
   @Expose({ name: 'tenantId' })
@@ -20,7 +20,7 @@ export class TenantHeader {
 export class AuthorizationHeader {
   @IsString()
   @IsNotEmpty()
-  @Matches(RegexPatternsEnum.AUTHORIZATION_HEADER, {
+  @Matches(RegexPatterns.AUTHORIZATION_HEADER, {
     message: 'Invalid Authorization Header',
   })
   authorization!: string;

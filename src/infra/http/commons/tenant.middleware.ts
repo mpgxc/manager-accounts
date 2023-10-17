@@ -1,4 +1,5 @@
 import { Maybe } from '@commons/logic';
+import { CacheTTL } from '@commons/types';
 import { Tenant } from '@domain/entities/tenant';
 import { TenantRepository } from '@domain/repositories/tenant-repository';
 import { ImplTenantRepository } from '@infra/database/repositories';
@@ -14,7 +15,7 @@ import {
   NestMiddleware,
   NotFoundException,
 } from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { Cache as Cachemanager } from 'cache-manager';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { firstValueFrom } from 'rxjs';
 import { TenantHeader } from '../inputs';
@@ -27,7 +28,7 @@ export class TenantMiddleware
 {
   constructor(
     @Inject(CACHE_MANAGER)
-    private readonly cacheManager: Cache,
+    private readonly cacheManager: Cachemanager,
     private readonly secretsManager: ImplSecretsManagerProvider,
 
     @Inject(ImplTenantRepository.name)
@@ -48,13 +49,17 @@ export class TenantMiddleware
         return false;
       }
 
-      await this.cacheManager.set(`${tenantCode}_ENTITY`, tenant);
+      await this.cacheManager.set(
+        `${tenantCode}_ENTITY`,
+        tenant.id,
+        CacheTTL.ONE_DAY,
+      );
     }
 
     return true;
   }
 
-  async use(req: FastifyRequest, res: FastifyReply, next: () => void) {
+  async use(req: FastifyRequest, _res: FastifyReply, next: () => void) {
     const tenantCode = req.headers['x-tenant-id'] as string;
 
     const instance = Object.assign(new TenantHeader(), {
@@ -85,7 +90,11 @@ export class TenantMiddleware
         this.secretsManager.get({ key: tenantCode }),
       );
 
-      await this.cacheManager.set(`${tenantCode}_SECRETS`, secrets);
+      await this.cacheManager.set(
+        `${tenantCode}_SECRETS`,
+        secrets,
+        CacheTTL.ONE_DAY,
+      );
     }
 
     return next();

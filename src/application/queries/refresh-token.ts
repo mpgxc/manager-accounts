@@ -16,7 +16,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Cache } from 'cache-manager';
+import { Cache as Cachemanager } from 'cache-manager';
 import dayjs from 'dayjs';
 import { decode } from 'jsonwebtoken';
 
@@ -32,7 +32,7 @@ class ImplRefreshTokenQuery implements RefreshTokenQuery {
     private readonly config: ConfigService,
 
     @Inject(CACHE_MANAGER)
-    private readonly cacheManager: Cache,
+    private readonly cacheManager: Cachemanager,
 
     @Inject(ImplTokenRepository.name)
     private readonly tokenRepository: TokenRepository,

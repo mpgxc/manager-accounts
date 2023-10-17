@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { HasherProvider } from './hasher.interface';
 
 @Injectable()
-class ImplHasherProvider implements HasherProvider {
+export class ImplHasherProvider implements HasherProvider {
   public readonly saltOrRounds = 10;
 
   async hash(password: string): Promise<string> {
@@ -16,5 +16,3 @@ class ImplHasherProvider implements HasherProvider {
     return bcrypt.compare(password, hash);
   }
 }
-
-export { ImplHasherProvider };

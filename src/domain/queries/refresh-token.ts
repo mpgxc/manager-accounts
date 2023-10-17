@@ -19,9 +19,4 @@ interface RefreshTokenQuery {
   handle(props: RefreshTokenQueryInput): Promise<RefreshTokenQueryOutput>;
 }
 
-export {
-  RefreshTokenQuery,
-  RefreshTokenQueryInput,
-  RefreshTokenQueryOutput,
-  RefreshTokenQueryOutputProps,
-};
+export { RefreshTokenQuery, RefreshTokenQueryInput, RefreshTokenQueryOutput };

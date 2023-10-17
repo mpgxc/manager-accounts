@@ -1,13 +1,14 @@
 import { SetMetadata } from '@nestjs/common';
 
-export enum ServicesEnum {
+enum Resources {
+  All = 'all',
   Orders = 'orders',
   Products = 'products',
   Accounts = 'accounts',
   Establishments = 'establishments',
 }
 
-export enum ActionsEnum {
+enum Actions {
   All = 'all',
   Read = 'read',
   Create = 'create',
@@ -17,7 +18,7 @@ export enum ActionsEnum {
 
 export const PERMISSIONS_KEY = 'permissions';
 
-export type PermissionsUnion = `${ServicesEnum}:${ActionsEnum}`;
+export type Permissions = `${Resources}:${Actions}`;
 
-export const Permissions = (...permissions: PermissionsUnion[]) =>
+export const Permissions = (...permissions: Permissions[]) =>
   SetMetadata(PERMISSIONS_KEY, permissions);
