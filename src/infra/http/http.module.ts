@@ -13,11 +13,19 @@ import {
   TokenStrategy,
 } from './auth';
 import { TenantMiddleware } from './commons/tenant.middleware';
-import { AccountsController } from './controllers/account.controller';
+import { AccountsProfileController } from './controllers/account-profile.controller';
+import { AuthenticateController } from './controllers/authenticate.controller';
+import { RefreshTokenController } from './controllers/refresh-token.controller';
+import { RegisterAccountController } from './controllers/register-account.controller';
 
 @Module({
   imports: [ApplicationModule],
-  controllers: [AccountsController],
+  controllers: [
+    RegisterAccountController,
+    AccountsProfileController,
+    AuthenticateController,
+    RefreshTokenController,
+  ],
   providers: [
     TokenStrategy,
     RefreshTokenStrategy,
@@ -39,6 +47,6 @@ export class InfraHttpModule implements NestModule {
         method: RequestMethod.ALL,
         path: 'accounts/me(.*)',
       })
-      .forRoutes(AccountsController);
+      .forRoutes(AccountsProfileController, RefreshTokenController);
   }
 }
