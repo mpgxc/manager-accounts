@@ -21,7 +21,6 @@ import { ImplTokensProvider } from './providers/tokens';
 
 const InfraContainerInject = [
   ImplSecretsManagerProvider,
-  ApplicationErrorMapper,
   ImplTokensProvider,
   ImplHasherProvider,
   LoggerService,
