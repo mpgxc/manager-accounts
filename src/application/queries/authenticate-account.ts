@@ -12,7 +12,7 @@ import { ImplAccountRepository } from '@infra/database/repositories';
 import { ImplTokenRepository } from '@infra/database/repositories/token-repository';
 import { ImplHasherProvider } from '@infra/providers/hasher';
 import { LoggerService } from '@infra/providers/logger/logger.service';
-import { ImplTokensProvider } from '@infra/providers/tokens/tokens.provider';
+import { ImplTokensProvider } from '@infra/providers/tokens';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import dayjs from 'dayjs';
