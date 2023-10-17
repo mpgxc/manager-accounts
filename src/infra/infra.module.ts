@@ -18,10 +18,12 @@ import {
   ImplSecretsManagerProvider,
   SecretsManagerPackage,
 } from './providers/secrets-manager';
+import { ImplTokensProvider } from './providers/tokens/tokens.provider';
 
 const InfraContainerInject = [
   ImplSecretsManagerProvider,
   ApplicationErrorMapper,
+  ImplTokensProvider,
   ImplHasherProvider,
   LoggerService,
 ];
