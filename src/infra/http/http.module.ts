@@ -47,6 +47,10 @@ export class InfraHttpModule implements NestModule {
         method: RequestMethod.ALL,
         path: 'accounts/me(.*)',
       })
-      .forRoutes(AccountsProfileController, RefreshTokenController);
+      .forRoutes(
+        AuthenticateController,
+        RefreshTokenController,
+        AccountsProfileController,
+      );
   }
 }
