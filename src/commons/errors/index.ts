@@ -12,6 +12,7 @@ export enum ApplicationErrorEnum {
   TenantNotFound,
   TenantAlreadyExists,
   CantRefreshToken,
+  ConflictManySessionsRequest,
 }
 
 export type ApplicationErrorType = keyof typeof ApplicationErrorEnum;

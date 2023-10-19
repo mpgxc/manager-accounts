@@ -100,7 +100,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
         return Result.failure(
           ApplicationError.build({
             message: 'Cant authenticate account! Many refresh tokens!',
-            name: 'UnexpectedError',
+            name: 'ConflictManySessionsRequest',
           }),
         );
       }
