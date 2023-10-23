@@ -1,5 +1,5 @@
 import { UserRequester } from '@global/fastify';
-import { LoggerService } from '@infra/providers/logger/logger.service';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import {
   Controller,
   Get,
@@ -20,9 +20,10 @@ import { MeOutput, NotAuthorizedOutput } from '../outputs/account.output';
 @ApiTags('accounts')
 @Controller('accounts')
 export class AccountsProfileController {
-  constructor(private readonly logger: LoggerService) {
-    this.logger.setContext(AccountsProfileController.name);
-  }
+  constructor(
+    @LoggerInject(AccountsProfileController.name)
+    private readonly logger: LoggerService,
+  ) {}
 
   @Get('me')
   @UseGuards(TokenGuard)

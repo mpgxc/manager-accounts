@@ -1,6 +1,6 @@
 import { GrpcClientOptionsService } from '@infra/grpc/grpc-clients.options';
 import { kafkaClientConfigsService } from '@infra/messaging/kafka/kafka.configs';
-import { LoggerService } from '@infra/providers/logger/logger.service';
+import { LoggerService } from '@mpgxc/logger';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -61,7 +61,7 @@ import { AppModule } from './app.module';
 
   SwaggerModule.setup('api', app, document);
 
-  await app.startAllMicroservices();
+  // await app.startAllMicroservices();
 
   await app.listen(
     config.getOrThrow('APP.APP_PORT'),

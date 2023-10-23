@@ -7,7 +7,7 @@ import {
 } from '@domain/queries/get-account';
 import { AccountRepository } from '@domain/repositories/account-repository';
 import { ImplAccountRepository } from '@infra/database/repositories';
-import { LoggerService } from '@infra/providers/logger/logger.service';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -15,6 +15,8 @@ class ImplGetAccountQuery implements GetAccountQuery {
   constructor(
     @Inject(ImplAccountRepository.name)
     private readonly repository: AccountRepository,
+
+    @LoggerInject(ImplGetAccountQuery.name)
     private readonly logger: LoggerService,
   ) {}
 

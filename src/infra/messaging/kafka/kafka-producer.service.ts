@@ -1,4 +1,4 @@
-import { LoggerService } from '@infra/providers/logger/logger.service';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { kafkaClientConfigsService } from './kafka.configs';
@@ -12,7 +12,10 @@ export class KafkaProducerService
   extends ClientKafka
   implements OnModuleDestroy, OnModuleInit
 {
-  constructor(kafkaConfigs: kafkaClientConfigsService, logger: LoggerService) {
+  constructor(
+    kafkaConfigs: kafkaClientConfigsService,
+    @LoggerInject(KafkaProducerService.name) logger: LoggerService,
+  ) {
     super({
       client: kafkaConfigs.clientConfigs,
       producer: {

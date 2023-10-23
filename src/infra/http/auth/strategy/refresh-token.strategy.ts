@@ -2,11 +2,11 @@ import { ImplGetAccountQuery } from '@application/queries/get-account';
 import { CacheTTL } from '@commons/types';
 import { GetAccountQuery } from '@domain/queries/get-account';
 import { UserRequester } from '@global/fastify';
-import { LoggerService } from '@infra/providers/logger/logger.service';
 import {
   SecretsManagerOutput,
   SecretsManagerProviderImpl,
 } from '@infra/providers/secrets-manager';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
@@ -29,7 +29,9 @@ export class RefreshTokenStrategy extends PassportStrategy(
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: CacheManager,
 
+    @LoggerInject(RefreshTokenStrategy.name)
     private readonly logger: LoggerService,
+
     private readonly secretsManager: SecretsManagerProviderImpl,
   ) {
     super({
@@ -41,8 +43,6 @@ export class RefreshTokenStrategy extends PassportStrategy(
         secretsManager,
       ),
     });
-
-    this.logger.setContext(RefreshTokenStrategy.name);
   }
 
   private static getSecretKey =

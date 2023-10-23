@@ -1,7 +1,7 @@
 import { ImplRegisterAccountCommand } from '@application/commands/register-account';
 import { ExceptionMapper } from '@commons/errors';
 import { RegisterAccountCommand } from '@domain/commands/register-account';
-import { LoggerService } from '@infra/providers/logger/logger.service';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import {
   Body,
   Controller,
@@ -28,10 +28,9 @@ export class RegisterAccountController {
     @Inject(ImplRegisterAccountCommand.name)
     private readonly registerAccountCommand: RegisterAccountCommand,
 
+    @LoggerInject(RegisterAccountController.name)
     private readonly logger: LoggerService,
-  ) {
-    this.logger.setContext(RegisterAccountController.name);
-  }
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

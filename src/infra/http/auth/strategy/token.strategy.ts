@@ -4,11 +4,11 @@ import {
   GetAccountQuery,
   GetAccountQueryOutputProps,
 } from '@domain/queries/get-account';
-import { LoggerService } from '@infra/providers/logger/logger.service';
 import {
   SecretsManagerOutput,
   SecretsManagerProviderImpl,
 } from '@infra/providers/secrets-manager';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
@@ -43,7 +43,9 @@ export class TokenStrategy extends PassportStrategy(Strategy, 'jwt') {
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: CacheManager,
 
+    @LoggerInject(TokenStrategy.name)
     private readonly logger: LoggerService,
+
     private readonly secretsManager: SecretsManagerProviderImpl,
   ) {
     super({
@@ -54,8 +56,6 @@ export class TokenStrategy extends PassportStrategy(Strategy, 'jwt') {
         secretsManager,
       ),
     });
-
-    this.logger.setContext(TokenStrategy.name);
   }
 
   private static getSecretKey =

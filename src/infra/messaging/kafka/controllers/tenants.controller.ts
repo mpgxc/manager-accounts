@@ -1,6 +1,6 @@
 import { ImplRegisterTenantCommand } from '@application/commands/register-tenant';
 import { RegisterTenantCommand } from '@domain/commands/register-tenant';
-import { LoggerService } from '@infra/providers/logger/logger.service';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { Controller, Inject } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 
@@ -15,6 +15,7 @@ export class TenantsController {
     @Inject(ImplRegisterTenantCommand.name)
     private readonly registerTenantCommand: RegisterTenantCommand,
 
+    @LoggerInject(TenantsController.name)
     private readonly logger: LoggerService,
   ) {}
 
