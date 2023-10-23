@@ -1,3 +1,4 @@
+import { GrpcClientOptionsService } from '@infra/grpc/grpc-clients.options';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -8,7 +9,6 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as path from 'node:path';
 import { AppModule } from './app.module';
 
 (async () => {
@@ -25,6 +25,7 @@ import { AppModule } from './app.module';
 
   const config = await app.resolve(ConfigService);
   const logger = await app.resolve(LoggerService);
+  const options = await app.resolve(GrpcClientOptionsService);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -57,13 +58,7 @@ import { AppModule } from './app.module';
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
-    options: {
-      package: 'accounts',
-      protoPath: path.join(__dirname, './infra/grpc/accounts.proto'),
-      url: `${config.getOrThrow<string>(
-        'GRPC.GRPC_HOST',
-      )}:${config.getOrThrow<string>('GRPC.GRPC_PORT')}`,
-    },
+    options: options.accountsOptions,
   });
 
   const document = SwaggerModule.createDocument(
