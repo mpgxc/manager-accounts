@@ -10,13 +10,21 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { pino } from 'pino';
 import { AppModule } from './app.module';
 
 (async () => {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({
-      logger: true,
+      logger: pino({
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+          },
+        },
+      }),
     }),
     {
       rawBody: true,
@@ -61,7 +69,7 @@ import { AppModule } from './app.module';
 
   SwaggerModule.setup('api', app, document);
 
-  // await app.startAllMicroservices();
+  await app.startAllMicroservices();
 
   await app.listen(
     config.getOrThrow('APP.APP_PORT'),
