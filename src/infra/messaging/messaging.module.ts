@@ -1,11 +1,12 @@
 import { ApplicationContainerInject } from '@application/application.module';
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { TenantsController } from './controllers/tenants.controller';
 import {
   KafkaProducerService,
   KafkaProducerServiceDummy,
 } from './kafka-producer.service';
 
+@Global()
 @Module({
   providers: [
     {

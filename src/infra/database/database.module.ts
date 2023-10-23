@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 
 import { TenantMapper } from './mappers/tenant-mapper';
 import { ImplAccountRepository } from './repositories';
@@ -23,8 +23,8 @@ export const DatabaseContainerInject = Object.freeze({
   },
 });
 
+@Global()
 @Module({
-  imports: [],
   providers: [
     TenantMapper,
     PrismaService,
