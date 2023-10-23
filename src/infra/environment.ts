@@ -14,17 +14,21 @@ const appSchema = z.object({
 
 const grpcSchema = z.object({
   GRPC_HOST: z.string().default('0.0.0.0'),
-  GRPC_PORT: z.string().default('5000'),
-  SM_GRPC_PACKAGE: z.string().nonempty(),
+  GRPC_PORT: z.string().default('5001'),
+  GRPC_PACKAGE: z.string(),
+
+  SM_GRPC_HOST: z.string().min(1),
+  SM_GRPC_PORT: z.string().min(1),
+  SM_GRPC_PACKAGE: z.string().min(1),
 });
 
 const kafkaSchema = z.object({
-  KAFKA_BROKER: z.string().nonempty(),
-  KAFKA_GROUP_ID: z.string().nonempty(),
-  KAFKA_CLIENT_ID: z.string().nonempty(),
-  KAFKA_MECHANISM: z.string().nonempty(),
-  KAFKA_USERNAME: z.string().nonempty(),
-  KAFKA_PASSWORD: z.string().nonempty(),
+  KAFKA_BROKER: z.string().min(1),
+  KAFKA_GROUP_ID: z.string().min(1),
+  KAFKA_CLIENT_ID: z.string().min(1),
+  KAFKA_MECHANISM: z.string().min(1),
+  KAFKA_USERNAME: z.string().min(1),
+  KAFKA_PASSWORD: z.string().min(1),
   KAFKA_SSL: z.string().default('true'),
 });
 

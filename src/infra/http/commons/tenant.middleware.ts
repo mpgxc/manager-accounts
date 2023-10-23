@@ -4,8 +4,8 @@ import { Tenant } from '@domain/entities/tenant';
 import { TenantRepository } from '@domain/repositories/tenant-repository';
 import { ImplTenantRepository } from '@infra/database/repositories';
 import {
-  ImplSecretsManagerProvider,
   SecretsManagerOutput,
+  SecretsManagerProviderImpl,
 } from '@infra/providers/secrets-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
@@ -29,7 +29,7 @@ export class TenantMiddleware
   constructor(
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cachemanager,
-    private readonly secretsManager: ImplSecretsManagerProvider,
+    private readonly secretsManager: SecretsManagerProviderImpl,
 
     @Inject(ImplTenantRepository.name)
     private readonly tenantRepository: TenantRepository,

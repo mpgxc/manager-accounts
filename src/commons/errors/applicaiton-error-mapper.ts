@@ -23,6 +23,7 @@ const exceptionMapper = <T extends ApplicationErrorType[]>(
         'AccountAlreadyExists',
         'EmailAlreadyRegistered',
         'TenantAlreadyExists',
+        'ConflictManySessionsRequest',
       ] as T
     ).includes(token)
   ) {

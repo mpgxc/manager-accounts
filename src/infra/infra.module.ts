@@ -1,44 +1,26 @@
 import { CacheModule } from '@nestjs/cache-manager';
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { PassportModule } from '@nestjs/passport';
 import { redisStore } from 'cache-manager-redis-yet';
-import * as path from 'node:path';
-import { type RedisClientOptions } from 'redis';
+
+import { PassportModule } from '@nestjs/passport';
+import { RedisClientOptions } from 'redis';
 import { DatabaseModule } from './database/database.module';
 import { configuration } from './environment';
+import { InfraGRPCModule } from './grpc/grpc.module';
 import { InfraHttpModule } from './http/http.module';
 import { MessagingModule } from './messaging/messaging.module';
-import { ImplHasherProvider } from './providers/hasher';
-import { LoggerService } from './providers/logger/logger.service';
-import {
-  ImplSecretsManagerProvider,
-  SecretsManagerPackage,
-} from './providers/secrets-manager';
-import { ImplTokensProvider } from './providers/tokens';
+import { ProvidersModule } from './providers/providers.module';
 
-const InfraContainerInject = [
-  ImplSecretsManagerProvider,
-  ImplTokensProvider,
-  ImplHasherProvider,
-  LoggerService,
-];
-
-@Global()
 @Module({
   imports: [
     PassportModule,
+    InfraGRPCModule,
     InfraHttpModule,
-    {
-      module: MessagingModule,
-      global: true,
-    },
-    {
-      module: DatabaseModule,
-      global: true,
-    },
+    ProvidersModule,
+    MessagingModule,
+    DatabaseModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
@@ -54,19 +36,6 @@ const InfraContainerInject = [
         algorithm: 'RS256',
       },
     }),
-    ClientsModule.register([
-      {
-        name: SecretsManagerPackage,
-        transport: Transport.GRPC,
-        options: {
-          url: `${process.env.GRPC_HOST!}:${process.env.GRPC_PORT!}`,
-          package: process.env.SM_GRPC_PACKAGE!,
-          protoPath: path.join(__dirname, './grpc/secrets-manager.proto'),
-        },
-      },
-    ]),
   ],
-  providers: InfraContainerInject,
-  exports: InfraContainerInject,
 })
 export class InfraModule {}
