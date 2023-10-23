@@ -8,7 +8,7 @@ import {
 import { Account } from '@domain/entities/account';
 import { AccountRepository } from '@domain/repositories/account-repository';
 import { ImplAccountRepository } from '@infra/database/repositories';
-import { KafkaProducerService } from '@infra/messaging/kafka-producer.service';
+import { KafkaProducerService } from '@infra/messaging/kafka/kafka-producer.service';
 import { ImplHasherProvider } from '@infra/providers/hasher';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import { Inject, Injectable } from '@nestjs/common';

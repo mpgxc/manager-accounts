@@ -10,7 +10,7 @@ import {
 } from './secrets-manager.interface';
 
 @Injectable()
-export class ImplSecretsManagerProvider
+export class SecretsManagerProviderImpl
   implements SecretsManagerProvider, OnModuleInit
 {
   private secretsService!: SecretsManagerProvider;
