@@ -1,3 +1,5 @@
+import { GrpcClientOptionsService } from '@infra/grpc/grpc-clients.options';
+import { kafkaClientConfigsService } from '@infra/messaging/kafka/kafka.configs';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -8,7 +10,6 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as path from 'node:path';
 import { AppModule } from './app.module';
 
 (async () => {
@@ -25,7 +26,11 @@ import { AppModule } from './app.module';
 
   const config = await app.resolve(ConfigService);
   const logger = await app.resolve(LoggerService);
+  const options = await app.resolve(GrpcClientOptionsService);
+  const kafkaConfigs = await app.resolve(kafkaClientConfigsService);
 
+  app.setGlobalPrefix('api');
+  app.useLogger(logger);
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -36,33 +41,11 @@ import { AppModule } from './app.module';
     }),
   );
 
-  app.useLogger(logger);
-  app.setGlobalPrefix('api');
-
+  app.connectMicroservice<MicroserviceOptions>(options.accountsOptions);
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.KAFKA,
     options: {
-      client: {
-        clientId: config.getOrThrow<string>('KAFKA.KAFKA_CLIENT_ID'),
-        brokers: [config.getOrThrow<string>('KAFKA.KAFKA_BROKER')],
-        sasl: {
-          mechanism: 'scram-sha-256',
-          username: config.getOrThrow<string>('KAFKA.KAFKA_USERNAME'),
-          password: config.getOrThrow<string>('KAFKA.KAFKA_PASSWORD'),
-        },
-        ssl: true,
-      },
-    },
-  });
-
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.GRPC,
-    options: {
-      package: 'accounts',
-      protoPath: path.join(__dirname, './infra/grpc/accounts.proto'),
-      url: `${config.getOrThrow<string>(
-        'GRPC.GRPC_HOST',
-      )}:${config.getOrThrow<string>('GRPC.GRPC_PORT')}`,
+      client: kafkaConfigs.clientConfigs,
     },
   });
 

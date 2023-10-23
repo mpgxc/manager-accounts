@@ -4,8 +4,8 @@ import { GetAccountQuery } from '@domain/queries/get-account';
 import { UserRequester } from '@global/fastify';
 import { LoggerService } from '@infra/providers/logger/logger.service';
 import {
-  ImplSecretsManagerProvider,
   SecretsManagerOutput,
+  SecretsManagerProviderImpl,
 } from '@infra/providers/secrets-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
@@ -30,7 +30,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     private readonly cacheManager: CacheManager,
 
     private readonly logger: LoggerService,
-    private readonly secretsManager: ImplSecretsManagerProvider,
+    private readonly secretsManager: SecretsManagerProviderImpl,
   ) {
     super({
       ignoreExpiration: false,
@@ -46,7 +46,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
   }
 
   private static getSecretKey =
-    (cacheManager: CacheManager, secretsManager: ImplSecretsManagerProvider) =>
+    (cacheManager: CacheManager, secretsManager: SecretsManagerProviderImpl) =>
     async (
       request: FastifyRequest,
       jwtToken: string,

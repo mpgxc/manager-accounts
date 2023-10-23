@@ -1,13 +1,16 @@
 import { ApplicationContainerInject } from '@application/application.module';
-import { Module } from '@nestjs/common';
-import { TenantsController } from './controllers/tenants.controller';
+import { Global, Module } from '@nestjs/common';
+import { TenantsController } from './kafka/controllers/tenants.controller';
 import {
   KafkaProducerService,
   KafkaProducerServiceDummy,
-} from './kafka-producer.service';
+} from './kafka/kafka-producer.service';
+import { kafkaClientConfigsService } from './kafka/kafka.configs';
 
+@Global()
 @Module({
   providers: [
+    kafkaClientConfigsService,
     {
       provide: KafkaProducerService,
       useClass:
@@ -17,7 +20,7 @@ import {
     },
     ApplicationContainerInject.RegisterTenantCommand,
   ],
-  exports: [KafkaProducerService],
+  exports: [KafkaProducerService, kafkaClientConfigsService],
   controllers: [TenantsController],
 })
 export class MessagingModule {}

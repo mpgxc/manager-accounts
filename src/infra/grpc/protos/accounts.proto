@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package accounts;
+
+import "google/protobuf/empty.proto";
+
+message AccountDetails {
+  string id = 1;
+  string tenantCode = 2;
+  bool isValidToken = 3;
+
+  repeated Role roles = 4;
+
+  message Role {
+    string role = 1;
+    repeated string permissions = 2;
+  }
+}
+
+message AccountsInput {
+  string token = 1;
+}
+
+service SessionVerifyService {
+  rpc Verify (AccountsInput) returns (AccountDetails);
+}
