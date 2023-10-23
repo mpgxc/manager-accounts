@@ -10,8 +10,8 @@ import { Token, TokenRepository } from '@domain/repositories/token-repository';
 import { ImplAccountRepository } from '@infra/database/repositories';
 import { ImplTokenRepository } from '@infra/database/repositories/token-repository';
 import { ImplHasherProvider } from '@infra/providers/hasher';
-import { LoggerService } from '@infra/providers/logger/logger.service';
 import { ImplTokensProvider } from '@infra/providers/tokens';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import dayjs from 'dayjs';
@@ -25,13 +25,13 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
     @Inject(ImplTokenRepository.name)
     private readonly tokenRepository: TokenRepository,
 
+    @LoggerInject(ImplAuthenticateAccountQuery.name)
+    private readonly logger: LoggerService,
+
     private readonly hasher: ImplHasherProvider,
     private readonly tokens: ImplTokensProvider,
-    private readonly logger: LoggerService,
     private readonly config: ConfigService,
-  ) {
-    this.logger.setContext(ImplAuthenticateAccountQuery.name);
-  }
+  ) {}
 
   async handle({
     email,

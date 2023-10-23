@@ -1,7 +1,7 @@
 import { ImplAuthenticateAccountQuery } from '@application/queries/authenticate-account';
 import { ExceptionMapper } from '@commons/errors';
 import { AuthenticateAccountQuery } from '@domain/queries/authenticate-account';
-import { LoggerService } from '@infra/providers/logger/logger.service';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import {
   Body,
   Controller,
@@ -33,10 +33,9 @@ export class AuthenticateController {
     @Inject(ImplAuthenticateAccountQuery.name)
     private readonly authenticateAccountQuery: AuthenticateAccountQuery,
 
+    @LoggerInject(AuthenticateController.name)
     private readonly logger: LoggerService,
-  ) {
-    this.logger.setContext(AuthenticateController.name);
-  }
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)

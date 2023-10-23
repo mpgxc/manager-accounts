@@ -10,8 +10,8 @@ import { Token, TokenRepository } from '@domain/repositories/token-repository';
 import { ImplAccountRepository } from '@infra/database/repositories';
 import { ImplTokenRepository } from '@infra/database/repositories/token-repository';
 import { TokenPayloadInput } from '@infra/http/auth';
-import { LoggerService } from '@infra/providers/logger/logger.service';
 import { ImplTokensProvider } from '@infra/providers/tokens';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -26,13 +26,13 @@ class ImplRefreshTokenQuery implements RefreshTokenQuery {
     @Inject(ImplAccountRepository.name)
     private readonly accountRepository: AccountRepository,
 
-    private readonly jwtService: JwtService,
+    @LoggerInject(ImplRefreshTokenQuery.name)
     private readonly logger: LoggerService,
+
+    private readonly jwtService: JwtService,
     private readonly config: ConfigService,
     private readonly tokens: ImplTokensProvider,
-  ) {
-    this.logger.setContext(ImplRefreshTokenQuery.name);
-  }
+  ) {}
 
   async handle(
     props: RefreshTokenQueryInput,

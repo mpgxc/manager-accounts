@@ -8,7 +8,7 @@ import {
 import { Tenant } from '@domain/entities/tenant';
 import { TenantRepository } from '@domain/repositories/tenant-repository';
 import { ImplTenantRepository } from '@infra/database/repositories';
-import { LoggerService } from '@infra/providers/logger/logger.service';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -16,10 +16,10 @@ class ImplRegisterTenantCommand implements RegisterTenantCommand {
   constructor(
     @Inject(ImplTenantRepository.name)
     private readonly tenantRepository: TenantRepository,
+
+    @LoggerInject(ImplRegisterTenantCommand.name)
     private readonly logger: LoggerService,
-  ) {
-    this.logger.setContext(ImplRegisterTenantCommand.name);
-  }
+  ) {}
 
   async handle({
     name,

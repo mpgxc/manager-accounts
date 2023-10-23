@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { redisStore } from 'cache-manager-redis-yet';
 
+import { LoggerModule } from '@mpgxc/logger';
 import { PassportModule } from '@nestjs/passport';
 import { RedisClientOptions } from 'redis';
 import { DatabaseModule } from './database/database.module';
@@ -21,6 +22,9 @@ import { ProvidersModule } from './providers/providers.module';
     ProvidersModule,
     MessagingModule,
     DatabaseModule,
+    LoggerModule.forRoot({
+      isGlobal: true,
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],

@@ -1,7 +1,7 @@
 import { ImplRefreshTokenQuery } from '@application/queries/refresh-token';
 import { ExceptionMapper } from '@commons/errors';
 import { RefreshTokenQuery } from '@domain/queries/refresh-token';
-import { LoggerService } from '@infra/providers/logger/logger.service';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import {
   Controller,
   HttpCode,
@@ -31,10 +31,9 @@ export class RefreshTokenController {
     @Inject(ImplRefreshTokenQuery.name)
     private readonly refreshTokenQuery: RefreshTokenQuery,
 
+    @LoggerInject(RefreshTokenController.name)
     private readonly logger: LoggerService,
-  ) {
-    this.logger.setContext(RefreshTokenController.name);
-  }
+  ) {}
 
   @Patch('me/refresh-token')
   @UseGuards(RefreshTokenGuard)

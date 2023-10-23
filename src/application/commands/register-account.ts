@@ -10,7 +10,7 @@ import { AccountRepository } from '@domain/repositories/account-repository';
 import { ImplAccountRepository } from '@infra/database/repositories';
 import { KafkaProducerService } from '@infra/messaging/kafka/kafka-producer.service';
 import { ImplHasherProvider } from '@infra/providers/hasher';
-import { LoggerService } from '@infra/providers/logger/logger.service';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { Inject, Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 
@@ -19,12 +19,13 @@ class ImplRegisterAccountCommand implements RegisterAccountCommand {
   constructor(
     @Inject(ImplAccountRepository.name)
     private readonly repository: AccountRepository,
+
+    @LoggerInject(ImplRegisterAccountCommand.name)
+    private readonly logger: LoggerService,
+
     private readonly kafkaService: KafkaProducerService,
     private readonly hasher: ImplHasherProvider,
-    private readonly logger: LoggerService,
-  ) {
-    this.logger.setContext(ImplRegisterAccountCommand.name);
-  }
+  ) {}
 
   async handle({
     name,

@@ -1,11 +1,11 @@
 import { Either, Maybe, Result } from '@commons/logic';
 import { SecretsManagerOutput } from '@infra/providers/secrets-manager';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Cache as Cachemanager } from 'cache-manager';
-import { LoggerService } from '../logger/logger.service';
 import { TokenOptions, TokensProvider } from './tokens.interface';
 
 @Injectable()
@@ -15,12 +15,13 @@ export class ImplTokensProvider implements TokensProvider {
   constructor(
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cachemanager,
+
+    @LoggerInject(ImplTokensProvider.name)
     private readonly logger: LoggerService,
+
     private readonly config: ConfigService,
     private readonly jwtService: JwtService,
-  ) {
-    this.logger.setContext(ImplTokensProvider.name);
-  }
+  ) {}
 
   private async fetchSecrets(
     tenantCode: string,

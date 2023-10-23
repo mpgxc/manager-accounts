@@ -1,4 +1,4 @@
-import { LoggerService } from '@infra/providers/logger/logger.service';
+import { LoggerService } from '@mpgxc/logger';
 import 'dotenv/config';
 import { z } from 'zod';
 
@@ -46,7 +46,7 @@ type ConfigurationEnvs = {
 };
 
 const configuration = (): ConfigurationEnvs => {
-  const logger = new LoggerService();
+  const logger = new LoggerService('Configuration Environment');
 
   return Object.keys(combinedSchema).reduce((acc, schema) => {
     const validate = combinedSchema[schema as CombinedSchemaKey].safeParse(

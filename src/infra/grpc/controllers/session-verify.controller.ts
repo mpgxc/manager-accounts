@@ -1,4 +1,4 @@
-import { LoggerService } from '@infra/providers/logger/logger.service';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { randomInt, randomUUID } from 'node:crypto';
@@ -9,7 +9,10 @@ type SessionVerifyInput = {
 
 @Controller()
 export class SessionVerifyController {
-  constructor(private readonly logger: LoggerService) {}
+  constructor(
+    @LoggerInject(SessionVerifyController.name)
+    private readonly logger: LoggerService,
+  ) {}
 
   @GrpcMethod('SessionVerifyService', 'Verify')
   async verify({ token }: SessionVerifyInput): Promise<any> {
