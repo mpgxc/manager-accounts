@@ -2,12 +2,7 @@ import * as path from 'node:path';
 
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
-type GrpcClientOptions = {
-  url: string;
-  package: string;
-  protoPath: string;
-};
+import { ClientOptions, Transport } from '@nestjs/microservices';
 
 type zString = `GRPC.${string}`;
 
@@ -20,18 +15,21 @@ export class GrpcClientOptionsService {
     _port: zString,
     _package: zString,
     _protoPath: string,
-  ): GrpcClientOptions {
+  ): ClientOptions {
     const host = this.config.getOrThrow(_host);
     const port = this.config.getOrThrow(_port);
 
     return {
-      url: `${host}:${port}`,
-      package: this.config.getOrThrow(_package),
-      protoPath: path.join(__dirname, _protoPath),
+      transport: Transport.GRPC,
+      options: {
+        url: `${host}:${port}`,
+        package: this.config.getOrThrow(_package),
+        protoPath: path.join(__dirname, _protoPath),
+      },
     };
   }
 
-  get accountsOptions(): GrpcClientOptions {
+  get accountsOptions(): ClientOptions {
     return this.buildClientOptions(
       'GRPC.GRPC_HOST',
       'GRPC.GRPC_PORT',
@@ -40,7 +38,7 @@ export class GrpcClientOptionsService {
     );
   }
 
-  get secretsManagerOptions(): GrpcClientOptions {
+  get secretsManagerOptions(): ClientOptions {
     return this.buildClientOptions(
       'GRPC.SM_GRPC_HOST',
       'GRPC.SM_GRPC_PORT',

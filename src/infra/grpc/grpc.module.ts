@@ -1,9 +1,9 @@
 import {
-  ImplSecretsManagerProvider,
   SecretsManagerPackage,
+  SecretsManagerProviderImpl,
 } from '@infra/providers/secrets-manager';
 import { Global, Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientsModule } from '@nestjs/microservices';
 import { SessionVerifyController } from './controllers/session-verify.controller';
 import { GrpcClientOptionsService } from './grpc-clients.options';
 
@@ -14,15 +14,13 @@ import { GrpcClientOptionsService } from './grpc-clients.options';
       {
         name: SecretsManagerPackage,
         inject: [GrpcClientOptionsService],
-        useFactory: (options: GrpcClientOptionsService) => ({
-          transport: Transport.GRPC,
-          options: options.secretsManagerOptions,
-        }),
+        useFactory: (options: GrpcClientOptionsService) =>
+          options.secretsManagerOptions,
       },
     ]),
   ],
   controllers: [SessionVerifyController],
-  providers: [GrpcClientOptionsService, ImplSecretsManagerProvider],
-  exports: [GrpcClientOptionsService, ImplSecretsManagerProvider],
+  providers: [GrpcClientOptionsService, SecretsManagerProviderImpl],
+  exports: [GrpcClientOptionsService, SecretsManagerProviderImpl],
 })
 export class InfraGRPCModule {}
