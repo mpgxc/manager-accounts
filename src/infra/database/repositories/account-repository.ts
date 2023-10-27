@@ -1,10 +1,10 @@
 import { Maybe } from '@commons/logic';
-import { AccountProps } from '@commons/types';
 import { Account } from '@domain/entities/account';
 import { Permissions } from '@domain/entities/permissions';
 import { Roles } from '@domain/entities/roles';
 import {
   AccountRepository,
+  AccountRepositoryOutput,
   AccountRepositoryQueryInput,
 } from '@domain/repositories/account-repository';
 import { Injectable } from '@nestjs/common';
@@ -321,9 +321,9 @@ export class ImplAccountRepository implements AccountRepository {
       : null;
   }
 
-  async list(
-    queryPaginator?: QueryPaginator | undefined,
-  ): Promise<Paginator<AccountProps>> {
+  list(
+    queryPaginator?: Maybe<QueryPaginator>,
+  ): Promise<Paginator<AccountRepositoryOutput>> {
     throw new Error('Method not implemented.');
   }
 }

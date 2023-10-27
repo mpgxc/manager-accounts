@@ -1,9 +1,10 @@
 import { Repository } from '@commons/interfaces';
 import { Maybe } from '@commons/logic';
-import { AccountProps } from '@commons/types';
-import { Account } from '@domain/entities/account';
+import { Account, AccountProps } from '@domain/entities/account';
 
-type AccountRepositoryOutput = AccountProps;
+type AccountRepositoryOutput = AccountProps & {
+  id: string;
+};
 
 type AccountRepositoryQueryInput = {
   email?: string;
