@@ -1,12 +1,12 @@
 import { ApplicationError } from '@commons/errors';
-import { Either } from '@commons/logic';
+import { Result } from '@commons/logic/result';
 
 type RegisterTenantCommandInput = {
   name: string;
   description: string;
 };
 
-type RegisterTenantCommandOutput = Either<ApplicationError, unknown>;
+type RegisterTenantCommandOutput = Result<void, ApplicationError>;
 
 interface RegisterTenantCommand {
   handle(

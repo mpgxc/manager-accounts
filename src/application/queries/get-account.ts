@@ -49,7 +49,7 @@ class ImplGetAccountQuery implements GetAccountQuery {
           'Application > Command > Get Account > Account not found',
         );
 
-        return Result.failure(
+        return Result.Err(
           ApplicationError.build({
             message: 'Account not found!',
             name: 'AccountNotFound',
@@ -64,7 +64,7 @@ class ImplGetAccountQuery implements GetAccountQuery {
       }));
 
       //TODO: Tem que virar mapper!
-      return Result.success({
+      return Result.Ok({
         ...account.props,
         id: account.id,
         password: undefined,
@@ -76,7 +76,7 @@ class ImplGetAccountQuery implements GetAccountQuery {
         error,
       );
 
-      return Result.failure(
+      return Result.Err(
         ApplicationError.build({
           message: `Unexpected error on get account! ${
             (error as Error).message

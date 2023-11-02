@@ -34,7 +34,7 @@ class ImplRegisterTenantCommand implements RegisterTenantCommand {
       const tenantExists = await this.tenantRepository.findById(name);
 
       if (tenantExists) {
-        return Result.failure(
+        return Result.Err(
           ApplicationError.build({
             message: `Tenant ${name} already exists!`,
             name: 'TenantAlreadyExists',
@@ -44,14 +44,14 @@ class ImplRegisterTenantCommand implements RegisterTenantCommand {
 
       await this.tenantRepository.create(tenant);
 
-      return Result.success();
+      return Result.Ok();
     } catch (error) {
       this.logger.error(
         'Application > Command - Create Tenant > Unexpected Error',
         error,
       );
 
-      return Result.failure(
+      return Result.Err(
         ApplicationError.build({
           message: `Unexpected error on create tenant! ${
             (error as Error).message

@@ -1,5 +1,5 @@
 import { ApplicationError } from '@commons/errors';
-import { Either } from '@commons/logic';
+import { Result } from '@commons/logic';
 
 type RefreshTokenQueryInput = {
   refreshToken: string;
@@ -10,9 +10,9 @@ type RefreshTokenQueryOutputProps = {
   refreshToken: string;
 };
 
-type RefreshTokenQueryOutput = Either<
-  ApplicationError,
-  RefreshTokenQueryOutputProps
+type RefreshTokenQueryOutput = Result<
+  RefreshTokenQueryOutputProps,
+  ApplicationError
 >;
 
 interface RefreshTokenQuery {

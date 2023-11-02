@@ -43,7 +43,7 @@ class ImplRefreshTokenQuery implements RefreshTokenQuery {
       );
 
       if (!refreshTokenExists) {
-        return Result.failure(
+        return Result.Err(
           ApplicationError.build({
             message: 'Cant refresh token! Invalid refresh token!',
             name: 'CantRefreshToken',
@@ -58,7 +58,7 @@ class ImplRefreshTokenQuery implements RefreshTokenQuery {
       const account = await this.accountRepository.findById(sub);
 
       if (!account) {
-        return Result.failure(
+        return Result.Err(
           ApplicationError.build({
             message: 'Cant refresh token! Invalid refresh token!',
             name: 'CantRefreshToken',
@@ -109,7 +109,7 @@ class ImplRefreshTokenQuery implements RefreshTokenQuery {
         }),
       );
 
-      return Result.success({
+      return Result.Ok({
         token,
         refreshToken,
       });
@@ -119,7 +119,7 @@ class ImplRefreshTokenQuery implements RefreshTokenQuery {
         error,
       );
 
-      return Result.failure(
+      return Result.Err(
         ApplicationError.build({
           message: `Unexpected error on refresh token! ${
             (error as Error).message

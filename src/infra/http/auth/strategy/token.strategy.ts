@@ -102,13 +102,13 @@ export class TokenStrategy extends PassportStrategy(Strategy, 'jwt') {
       tenantCode: payload.tenantCode,
     });
 
-    if (account.hasError) {
+    if (!account.isOk) {
       this.logger.warn(
-        `Http > Auth > Token Strategy > ${account.value.message}`,
+        `Http > Auth > Token Strategy > ${account.error.message}`,
       );
 
       throw new UnauthorizedException(
-        `You don't have permission! ${account.value.message}`,
+        `You don't have permission! ${account.error.message}`,
       );
     }
 

@@ -1,5 +1,5 @@
 import { ApplicationError } from '@commons/errors';
-import { Either } from '@commons/logic';
+import { Result } from '@commons/logic';
 
 type AuthenticateAccountQueryInput = {
   /**
@@ -21,9 +21,9 @@ type AuthenticateAccountQueryOutputProps = {
   refreshToken: string;
 };
 
-type AuthenticateAccountQueryOutput = Either<
-  ApplicationError,
-  AuthenticateAccountQueryOutputProps
+type AuthenticateAccountQueryOutput = Result<
+  AuthenticateAccountQueryOutputProps,
+  ApplicationError
 >;
 
 interface AuthenticateAccountQuery {

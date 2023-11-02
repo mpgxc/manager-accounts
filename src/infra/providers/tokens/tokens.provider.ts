@@ -1,4 +1,4 @@
-import { Either, Maybe, Result } from '@commons/logic';
+import { AsyncResult, Maybe, Result } from '@commons/logic';
 import { SecretsManagerOutput } from '@infra/providers/secrets-manager';
 import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -25,15 +25,15 @@ export class ImplTokensProvider implements TokensProvider {
 
   private async fetchSecrets(
     tenantCode: string,
-  ): Promise<Either<null, SecretsManagerOutput>> {
+  ): AsyncResult<SecretsManagerOutput, null> {
     try {
       const secrets = await this.cacheManager.get<SecretsManagerOutput>(
         `${tenantCode}_SECRETS`,
       );
 
-      return secrets ? Result.success(secrets) : Result.failure(null);
+      return secrets ? Result.Ok(secrets) : Result.Err(null);
     } catch (error) {
-      return Result.failure(null);
+      return Result.Err(null);
     }
   }
 
@@ -45,7 +45,7 @@ export class ImplTokensProvider implements TokensProvider {
 
     const secrets = await this.fetchSecrets(tenantCode);
 
-    if (secrets.hasError) {
+    if (!secrets.isOk) {
       this.logger.error(`Cant get secrets for tenant ${tenantCode}`);
 
       throw new Error('Cant get secrets!');

@@ -1,12 +1,12 @@
 import { ApplicationError } from '@commons/errors';
-import { Either } from '@commons/logic';
+import { Result } from '@commons/logic';
 
 type ResetPasswordCommandInput = {
   email: string;
   tenantCode: string;
 };
 
-type ResetPasswordCommandOutput = Either<ApplicationError, unknown>;
+type ResetPasswordCommandOutput = Result<ApplicationError, unknown>;
 
 interface ResetPasswordCommand {
   handle(props: ResetPasswordCommandInput): Promise<ResetPasswordCommandOutput>;

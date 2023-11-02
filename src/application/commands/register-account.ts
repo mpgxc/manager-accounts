@@ -45,7 +45,7 @@ class ImplRegisterAccountCommand implements RegisterAccountCommand {
       });
 
       if (accountExists) {
-        return Result.failure(
+        return Result.Err(
           ApplicationError.build({
             message: 'Account already exists!',
             name: 'AccountAlreadyExists',
@@ -69,14 +69,14 @@ class ImplRegisterAccountCommand implements RegisterAccountCommand {
         this.kafkaService.emit('tenants.created', account.props),
       );
 
-      return Result.success();
+      return Result.Ok();
     } catch (error) {
       this.logger.error(
         'Application > Command - Create Account > Unexpected Error',
         error,
       );
 
-      return Result.failure(
+      return Result.Err(
         ApplicationError.build({
           message: `Unexpected error on create account! ${
             (error as Error).message
