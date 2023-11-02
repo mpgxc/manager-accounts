@@ -1,5 +1,5 @@
 import { ApplicationError } from '@commons/errors';
-import { Either } from '@commons/logic';
+import { Result } from '@commons/logic';
 
 type RegisterAccountCommandInput = {
   name: string;
@@ -11,7 +11,7 @@ type RegisterAccountCommandInput = {
   tenantCode: string;
 };
 
-type RegisterAccountCommandOutput = Either<ApplicationError, unknown>;
+type RegisterAccountCommandOutput = Result<void, ApplicationError>;
 
 interface RegisterAccountCommand {
   handle(

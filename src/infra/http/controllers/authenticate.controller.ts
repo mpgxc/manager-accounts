@@ -61,12 +61,12 @@ export class AuthenticateController {
       tenantCode,
     });
 
-    if (response.hasError) {
+    if (!response.isOk) {
       this.logger.warn(
-        `Infra > Http > Controller > Authenticate Account > Failure: ${response.value.message}`,
+        `Infra > Http > Controller > Authenticate Account > Failure: ${response.error.message}`,
       );
 
-      throw ExceptionMapper(response.value);
+      throw ExceptionMapper(response.error);
     }
 
     this.logger.log(

@@ -60,12 +60,12 @@ export class RegisterAccountController {
       tenantCode,
     });
 
-    if (response.hasError) {
+    if (!response.isOk) {
       this.logger.warn(
-        `Infra > Http > Controller > Create Account > Failure: ${response.value.message}`,
+        `Infra > Http > Controller > Create Account > Failure: ${response.error.message}`,
       );
 
-      throw ExceptionMapper(response.value);
+      throw ExceptionMapper(response.error);
     }
 
     this.logger.log('Infra > Http > Controller > Create Account > Success', {

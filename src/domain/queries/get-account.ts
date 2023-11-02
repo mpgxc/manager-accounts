@@ -1,5 +1,5 @@
 import { ApplicationError } from '@commons/errors';
-import { Either } from '@commons/logic';
+import { Result } from '@commons/logic';
 
 type GetAccountQueryInput = {
   id?: string;
@@ -24,9 +24,9 @@ type GetAccountQueryOutputProps = {
   }>;
 };
 
-type GetAccountQueryOutput = Either<
-  ApplicationError,
-  GetAccountQueryOutputProps
+type GetAccountQueryOutput = Result<
+  GetAccountQueryOutputProps,
+  ApplicationError
 >;
 
 interface GetAccountQuery {

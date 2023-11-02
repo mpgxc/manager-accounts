@@ -28,9 +28,9 @@ export class TenantsController {
       description,
     });
 
-    if (response.hasError) {
+    if (!response.isOk) {
       this.logger.error(
-        `Infra > Messaging > Kafka > Tenants > Error syncing tenant ${name}: ${response.value.formatedMessage}`,
+        `Infra > Messaging > Kafka > Tenants > Error syncing tenant ${name}: ${response.error.formatedMessage}`,
       );
     } else {
       this.logger.log(

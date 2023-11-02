@@ -47,7 +47,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
       });
 
       if (!account) {
-        return Result.failure(
+        return Result.Err(
           ApplicationError.build({
             message: 'Cant authenticate account! Invalid credentials!',
             name: 'CantAuthenticateAccount',
@@ -61,7 +61,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
       );
 
       if (!passwordMatch) {
-        return Result.failure(
+        return Result.Err(
           ApplicationError.build({
             message: 'Cant authenticate account! Invalid credentials!',
             name: 'CantAuthenticateAccount',
@@ -97,7 +97,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
        * TODO: Implementar range de tempo para gerar novos refresh tokens
        */
       if (await this.tokenRepository.exists(refreshToken)) {
-        return Result.failure(
+        return Result.Err(
           ApplicationError.build({
             message: 'Cant authenticate account! Many refresh tokens!',
             name: 'ConflictManySessionsRequest',
@@ -118,7 +118,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
         }),
       );
 
-      return Result.success({
+      return Result.Ok({
         token,
         refreshToken,
       });
@@ -128,7 +128,7 @@ class ImplAuthenticateAccountQuery implements AuthenticateAccountQuery {
         error,
       );
 
-      return Result.failure(
+      return Result.Err(
         ApplicationError.build({
           message: `Unexpected error on authenticate account! ${
             (error as Error).message

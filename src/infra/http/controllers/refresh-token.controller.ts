@@ -48,12 +48,12 @@ export class RefreshTokenController {
       refreshToken: headers['authorization']!,
     });
 
-    if (response.hasError) {
+    if (!response.isOk) {
       this.logger.warn(
-        `Infra > Http > Controller > ReAuthenticate Account > Failure: ${response.value.message}`,
+        `Infra > Http > Controller > ReAuthenticate Account > Failure: ${response.error.message}`,
       );
 
-      throw ExceptionMapper(response.value);
+      throw ExceptionMapper(response.error);
     }
 
     return response.value;

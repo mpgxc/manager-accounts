@@ -90,13 +90,13 @@ export class RefreshTokenStrategy extends PassportStrategy(
       tenantCode: payload.tenantCode,
     });
 
-    if (account.hasError) {
+    if (!account.isOk) {
       this.logger.warn(
-        `Http > Auth > Refresh Token Strategy > ${account.value.message}`,
+        `Http > Auth > Refresh Token Strategy > ${account.error.message}`,
       );
 
       throw new UnauthorizedException(
-        `You don't have permission! ${account.value.message}`,
+        `You don't have permission! ${account.error.message}`,
       );
     }
 
