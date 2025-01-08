@@ -16,5 +16,5 @@ export interface Repository<Input extends Entity | AggregateRoot, Output> {
 
   findById(id: string): Promise<Maybe<Input>>;
 
-  list(queryPaginator?: QueryPaginator): Promise<Paginator<Output>>;
+  list(queryPaginator?: Maybe<QueryPaginator>): Promise<Paginator<Output>>;
 }

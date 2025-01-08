@@ -1,8 +1,9 @@
 import { Repository } from '@commons/interfaces';
-import { TenantProps } from '@commons/types';
-import { Tenant } from '@domain/entities/tenant';
+import { Tenant, TenantProps } from '@domain/entities/tenant';
 
-type TenantRepositoryOutput = TenantProps;
+type TenantRepositoryOutput = TenantProps & {
+  id: string;
+};
 
 interface TenantRepository
   extends Omit<

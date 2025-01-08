@@ -1,16 +1,22 @@
 import { Entity } from '@commons/domain';
 import { Repository } from '@commons/interfaces';
 import { Replace } from '@commons/logic';
-import { RefreshTokens } from '@commons/types';
 
-export class Token extends Entity<RefreshTokens> {
+export type TokenProps = {
+  accountId: string;
+  refreshToken: string;
+  expiresIn: Date;
+  createdAt: Date;
+};
+
+export class Token extends Entity<TokenProps> {
   get id(): string {
     return this.props.refreshToken;
   }
 
   static build(
     props: Replace<
-      RefreshTokens,
+      TokenProps,
       {
         createdAt?: Date;
       }
@@ -26,9 +32,13 @@ export class Token extends Entity<RefreshTokens> {
   }
 }
 
+type TokenRepositoryOutput = TokenProps & {
+  id: string;
+};
+
 interface TokenRepository
-  extends Omit<Repository<Token, RefreshTokens>, 'list'> {
+  extends Omit<Repository<Token, TokenRepositoryOutput>, 'list'> {
   updateOrCreate(item: Token): Promise<void>;
 }
 
-export { TokenRepository };
+export { TokenRepository, TokenRepositoryOutput };
